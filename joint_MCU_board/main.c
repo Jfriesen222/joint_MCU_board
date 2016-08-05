@@ -80,13 +80,9 @@ int main(void) {
         if (events & EVENT_UPDATE_SPEED) {
 
             iii++;
-            //pwmLED1 = (flex1 - 1350) / 2;
-            pwmLED2 = (flex1 - 1750) / 2;
 
             if (iii % 500 == 0) {
                 jjj++;
-                LED6 = !LED6;
-                LED7 = !LED6;
             }
 
             if (iii % 10 == 1) {
@@ -137,7 +133,6 @@ int main(void) {
         }
 
         if (events & EVENT_UPDATE_LENGTHS) {
-            LED6 = !LED6;
             events &= ~EVENT_UPDATE_LENGTHS;
         }
     }

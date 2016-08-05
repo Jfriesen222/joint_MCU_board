@@ -45,10 +45,8 @@ void MotorInit() {
     /* Set Dead Time Values */
     DTR1 = DTR2 = DTR3 = DTR4 = DTR5 = DTR6 = 0;
     ALTDTR1 = ALTDTR2 = ALTDTR3 = ALTDTR4 = ALTDTR5 = ALTDTR6 = 0;
-    /* Set PWM Mode to Independent */
-    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xCC00;
-    //Set unused PWM outputs as GPIO driven
-   //IOCON2 = 0x8C00;
+    /* Set PWM Mode to Complementary */
+    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xC000;
     /* Set Primary Time Base, Edge-Aligned Mode and Independent Duty Cycles */
     PWMCON1 =  PWMCON3 = PWMCON4 = PWMCON5 = PWMCON6 = 0x0000;
     /* Configure Faults */
@@ -94,19 +92,7 @@ void PinInit(void) {
    
     //TRIS_SDA =1;
     //TRIS_SCL =1;
-    TRIS_LED6 = 0;
-    TRIS_LED7 = 0;
 
-
-    SLNDMot_flt_tris   = 1;
-   
-    SLNDMot_flt_PU   = 1;
- 
-    pwmLED1 = 500;
-    pwmLED2 = 500;
-  
-    LED6 = 0;
-    LED7 = 0;
 
     //Right now no analog peripherals are being used, so we let digital
     //peripherals take over.
