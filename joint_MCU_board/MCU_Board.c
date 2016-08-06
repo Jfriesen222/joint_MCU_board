@@ -89,11 +89,6 @@ void ClockInit(void) {
 }
 
 void PinInit(void) {
-   
-    //TRIS_SDA =1;
-    //TRIS_SCL =1;
-
-
     //Right now no analog peripherals are being used, so we let digital
     //peripherals take over.
     ANSELA = 0;
@@ -102,8 +97,51 @@ void PinInit(void) {
     ANSELD = 0;
     ANSELE = 0;
     ANSELG = 0;
-  
-
+    
+    /* initialize LED pins as outputs */
+    TRIS_LED1 = 0;
+    TRIS_LED2 = 0;
+    TRIS_LED3 = 0;
+    TRIS_LED4 = 0;
+    
+    /* initialize CS pins as outputs */
+    TRIS_CS1_1 = 0;
+    TRIS_CS2_1 = 0;
+    TRIS_CS3_1 = 0;
+    TRIS_CS4_1 = 0;
+    TRIS_CS5_1 = 0;
+    TRIS_CS6_1 = 0;
+    
+    TRIS_CS1_2 = 0;
+    TRIS_CS2_2 = 0;
+    TRIS_CS3_2 = 0;
+    TRIS_CS4_2 = 0;
+    TRIS_CS5_2 = 0;
+    TRIS_CS6_2 = 0;
+    
+    TRIS_CS1_3 = 0;
+    TRIS_CS2_3 = 0;
+    TRIS_CS3_3 = 0;
+    TRIS_CS4_3 = 0;
+    TRIS_CS5_3 = 0;
+    TRIS_CS6_3 = 0;
+    
+    /* initialize switch pins as inputs */
+    TRIS_SW1_1 = 1;
+    TRIS_SW2_1 = 1;
+    TRIS_SW3_1 = 1;
+    TRIS_SW4_1 = 1;
+    
+    TRIS_SW1_2 = 1;
+    TRIS_SW2_2 = 1;
+    TRIS_SW3_2 = 1;
+    TRIS_SW4_2 = 1;
+    
+    TRIS_SW1_3 = 1;
+    TRIS_SW2_3 = 1;
+    TRIS_SW3_3 = 1;
+    TRIS_SW4_3 = 1;
+    
 //    //Set up Change Notify Interrupt
 //    //These correspond to your change hall effect pins.
 //    CNENCbits.CNIEC13 = 1; // Enable RC14 pin for interrupt detection
