@@ -30,6 +30,7 @@ uint16_t events;
 bool controller;
 ADCBuffer ADCBuff;
 long int iii = 0;
+int jj = 1;
 int jjj = 0;
 float flex1 = 0;
 float flex2 = 0;
@@ -85,11 +86,19 @@ int main(void) {
                 jjj++;
             }
 
-            if (iii % 10 == 1) {
+            if (iii % 10 == 0) {
                 //size = sprintf((char *) out, "%i,%i,%i,%i,%i,%i,%i,\r\n", (int) (10000 * quaternion[0]), (int) (10000 * quaternion[1]), (int) (10000 * quaternion[2]), (int) (10000 * quaternion[3]), (int) flex1, (int) flex2, (int) ADCBuff.Adc1Data[3]);
                 //size = sprintf((char *) out, "%5i  %5i  %5i  %5i  %5i  %5i  %5i  %5i  %5i\r\n", (int) (10 * imuData.accelX), (int) (10 * imuData.accelY), (int) (10 * imuData.accelZ), (int) (imuData.gyroX), (int) (imuData.gyroY), (int) (imuData.gyroZ), (int) (10 * imuData.magX), (int) (10 * imuData.magY), (int) (10 * imuData.magZ));
-                //size = sprintf((char *) out, "%5i  %5i  %5i  %5i\r\n", ADCBuff.Adc1Data[0],ADCBuff.Adc1Data[1],ADCBuff.Adc1Data[2],ADCBuff.Adc1Data[3]);
-                //DMA0_UART2_Transfer(size, out);
+                size = sprintf((char *) out, "%5i \r\n", (int) (iii/10));
+                DMA0_UART2_Transfer(size, out);
+            
+                //jj = (jj + (jj&0b10000)>>4)^0b10001;
+                LED1 = (jj & 0b1);
+                LED2 = (jj & 0b10)>>1;
+                LED3 = (jj & 0b100)>>2;
+                LED4 = (jj & 0b1000)>>3;
+                jj = ((jj<<1)); 
+                jj = jj==0b10000? 1:jj;
             }
             if (iii % 5 == 1) {
 

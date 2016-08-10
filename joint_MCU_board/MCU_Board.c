@@ -61,8 +61,8 @@ void UART2Init(void) {
     U2MODEbits.STSEL = 0; // 1-stop bit
     U2MODEbits.PDSEL = 0; // No parity, 8-data bits
     U2MODEbits.ABAUD = 0; // Auto-baud disabled
-    U2MODEbits.BRGH = 0; // High speed UART mode...
-    U2BRG = 37; //455 for 9600,227 for 19200, 113 for 38400,  37 for 115200 on BRGH 0, 460800 on BRGH 1, 921600 = 19
+    U2MODEbits.BRGH = 1; // High speed UART mode...
+    U2BRG = 18; //455 for 9600,227 for 19200, 113 for 38400,  37 for 115200 on BRGH 0, 460800 on BRGH 1, 921600 = 19
     //BRGH = 0, BRG = 18 for 230400
     U2STAbits.UTXISEL0 = 0; // int on last character shifted out tx register
     U2STAbits.UTXISEL1 = 0; // int on last character shifted out tx register
@@ -152,8 +152,8 @@ void PinInit(void) {
     //Unlock PPS Registers
     __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
 
-    OUT_PIN_PPS_RP82= OUT_FN_PPS_U2TX; //U2Tx
-    IN_FN_PPS_U2RX = IN_PIN_PPS_RP125; //U2Rx
+    OUT_PIN_PPS_RP67= OUT_FN_PPS_U2TX; //U2Tx
+    IN_FN_PPS_U2RX = IN_PIN_PPS_RP69; //U2Rx
 
     //Lock PPS Registers
     __builtin_write_OSCCONL(OSCCON | (1 << 6));
