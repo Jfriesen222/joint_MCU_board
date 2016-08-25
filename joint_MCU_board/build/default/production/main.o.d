@@ -4,4 +4,5 @@ MCU_Board.h  \
 DMA_Transfer.h  \
  CircularBuffer.h  \
 NMEAProtocol.h  \
-I2CdsPIC.h 
+I2CdsPIC.h  \
+LS7366R_SPI.h 

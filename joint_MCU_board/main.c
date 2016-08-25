@@ -17,6 +17,7 @@
 #include "CircularBuffer.h"
 #include "NMEAProtocol.h"
 #include "I2CdsPIC.h"
+#include "LS7366R_SPI.h"
 #include <p33Exxxx.h>
 
 CircularBuffer uartBuffer;
@@ -25,6 +26,13 @@ CircularBuffer canBuffer;
 uint8_t canBuf[64];
 CircularBuffer spiBuffer;
 uint16_t spiBuf[64];
+
+EncoderCts EncCts1;
+EncoderCts EncCts2;
+EncoderCts EncCts3;
+EncoderCts EncCts4;
+EncoderCts EncCts5;
+EncoderCts EncCts6;
 
 uint16_t events;
 bool controller;
@@ -50,18 +58,37 @@ void EventChecker(void);
 void SetMotors(void);
 
 int main(void) {
-
-    
     commandSet.cmd1 = 0;
     commandSet.cmd2 = 0;
     commandSet.cmd3 = 0;
     commandSet.cmd4 = 0;
     commandSet.cmd5 = 0;
-    static uint8_t out[64];
+    static uint8_t out[300];
     static uint8_t size;
     CB_Init(&uartBuffer, uartBuf, 32);
     CB_Init(&spiBuffer, (uint8_t *) spiBuf, 128);
     InitBoard(&ADCBuff, &uartBuffer, &spiBuffer, EventChecker);
+    
+    config_spi_slow();
+    CS1_1 = CS1_2  = CS1_3 = 0;
+    setQuadX4();
+    CS1_1 = CS1_2  = CS1_3 = 1;
+    CS2_1 = CS2_2  = CS2_3 = 0;
+    setQuadX4();
+    CS2_1 = CS2_2  = CS2_3 = 1;
+    CS3_1 = CS3_2  = CS3_3 = 0;
+    setQuadX4();
+    CS3_1 = CS3_2  = CS3_3 = 1;
+    CS4_1 = CS4_2  = CS4_3 = 0;
+    setQuadX4();
+    CS4_1 = CS4_2  = CS4_3 = 1;
+    CS5_1 = CS5_2  = CS5_3 = 0;
+    setQuadX4();
+    CS5_1 = CS5_2  = CS5_3 = 1;
+    CS6_1 = CS6_2  = CS6_3 = 0;
+    setQuadX4();
+    CS6_1 = CS6_2  = CS6_3 = 1;
+
     putsUART2((unsigned int *) "Init. Complete\r\n");
     controller = 0;
     SetMotors();
@@ -70,35 +97,82 @@ int main(void) {
     //Pass pointer to com protocol
 
 
-    long int i;
-
-    for (i = 0; i < 5000; i++) {
-        Nop(); //Let other IC'S catch their breath...
-    }
-
-
     while (1) {
         if (events & EVENT_UPDATE_SPEED) {
 
-            iii++;
+            /******************************************************************************
+             * Function:        void Delay(void))
+             *
+             * PreCondition:    None   
+             *
+             * Input:           None
+             *                  
+             * Output:          None
+             *
+             * Side Effects:    None
+             *
+             * Overview:        This function provides sofware Delay
+             *****************************************************************************/
 
+
+
+            RESET_3 = 1;
+            RESET_2 = 1;
+            RESET_1 = 1;
+            iii++;
+            MOTOR1_3 = 300; //(int) (700 * sin(iii / 1000.0) + 700);
+            MOTOR2_3 = 300; //(int) (700 * sin(iii / 1000.0) + 700);
+            MOTOR1_1 = 300; //(int) (700 * sin(iii / 1000.0) + 700);
+            MOTOR2_1 = 300; //(int) (700 * sin(iii / 1000.0) + 700);
+            MOTOR1_2 = 300; //(int) (700 * sin(iii / 1000.0) + 700);
+            MOTOR2_2 = 300; //(int) (700 * sin(iii / 1000.0) + 700);
+            MOTOR1_3R = 0;
+            MOTOR2_3R = 0;
+            MOTOR1_1R = 0;
+            MOTOR2_1R = 0;
+            MOTOR1_2R = 0;
+            MOTOR2_2R = 0;
             if (iii % 500 == 0) {
                 jjj++;
             }
 
-            if (iii % 10 == 0) {
+            if (iii % 30 == 0) {
                 //size = sprintf((char *) out, "%i,%i,%i,%i,%i,%i,%i,\r\n", (int) (10000 * quaternion[0]), (int) (10000 * quaternion[1]), (int) (10000 * quaternion[2]), (int) (10000 * quaternion[3]), (int) flex1, (int) flex2, (int) ADCBuff.Adc1Data[3]);
                 //size = sprintf((char *) out, "%5i  %5i  %5i  %5i  %5i  %5i  %5i  %5i  %5i\r\n", (int) (10 * imuData.accelX), (int) (10 * imuData.accelY), (int) (10 * imuData.accelZ), (int) (imuData.gyroX), (int) (imuData.gyroY), (int) (imuData.gyroZ), (int) (10 * imuData.magX), (int) (10 * imuData.magY), (int) (10 * imuData.magZ));
-                size = sprintf((char *) out, "%5i \r\n", (int) (iii/10));
+                CS1_1 = CS1_2  = CS1_3 = 0;
+                readEnc(&EncCts1);
+                CS1_1 = CS1_2  = CS1_3 = 1;
+                CS2_1 = CS2_2  = CS2_3 = 0;
+                readEnc(&EncCts2);
+                CS2_1 = CS2_2  = CS2_3 = 1;
+                CS3_1 = CS3_2  = CS3_3 = 0;
+                readEnc(&EncCts3);
+                CS3_1 = CS3_2  = CS3_3 = 1;
+                CS4_1 = CS4_2  = CS4_3 = 0;
+                readEnc(&EncCts4);
+                CS4_1 = CS4_2  = CS4_3 = 1;
+                CS5_1 = CS5_2  = CS5_3 = 0;
+                readEnc(&EncCts5);
+                CS5_1 = CS5_2  = CS5_3 = 1;
+                CS6_1 = CS6_2  = CS6_3 = 0;
+                readEnc(&EncCts6);
+                CS6_1 = CS6_2  = CS6_3 = 1;
+
+                size = sprintf((char *) out, "A: %5ld %5ld %5ld %5ld %5ld %5ld  B: %5ld %5ld %5ld %5ld %5ld %5ld  C: %5ld %5ld %5ld %5ld %5ld %5ld \r\n", 
+                        EncCts1.cts1 , EncCts2.cts1 , EncCts3.cts1 , EncCts4.cts1 , EncCts5.cts1 , EncCts6.cts1 ,
+                        EncCts1.cts2 , EncCts2.cts2 , EncCts3.cts2 , EncCts4.cts2 , EncCts5.cts2 , EncCts6.cts2 ,
+                        EncCts1.cts3 , EncCts2.cts3 , EncCts3.cts3 , EncCts4.cts3 , EncCts5.cts3 , EncCts6.cts3);
+                
                 DMA0_UART2_Transfer(size, out);
-            
+
                 //jj = (jj + (jj&0b10000)>>4)^0b10001;
+
                 LED1 = (jj & 0b1);
-                LED2 = (jj & 0b10)>>1;
-                LED3 = (jj & 0b100)>>2;
-                LED4 = (jj & 0b1000)>>3;
-                jj = ((jj<<1)); 
-                jj = jj==0b10000? 1:jj;
+                LED2 = (jj & 0b10) >> 1;
+                LED3 = (jj & 0b100) >> 2;
+                LED4 = (jj & 0b1000) >> 3;
+                jj = ((jj << 1));
+                jj = jj == 0b10000 ? 1 : jj;
             }
             if (iii % 5 == 1) {
 
@@ -127,6 +201,7 @@ int main(void) {
         }
 
         if (events & EVENT_SPI_RX) {
+
             events &= ~EVENT_SPI_RX;
         }
 
@@ -136,8 +211,8 @@ int main(void) {
 
         if (events & EVENT_ADC_DATA) {
 
-            flex1 = ((0.2 * ADCBuff.Adc1Data[1]) + (0.8 * flex1));
-            flex2 = ((0.2 * ADCBuff.Adc1Data[2]) + (0.8 * flex2));
+            //flex1 = ((0.2 * ADCBuff.Adc1Data[1]) + (0.8 * flex1));
+            //flex2 = ((0.2 * ADCBuff.Adc1Data[2]) + (0.8 * flex2));
             events &= ~EVENT_ADC_DATA;
         }
 

@@ -11,13 +11,20 @@
 
 /* Motor PWM */
 #define MOTOR1_1                PDC3                 
-#define MOTOR2_1                PDC4                 
+#define MOTOR2_1                PDC4
+#define MOTOR1_1R               SDC3                 
+#define MOTOR2_1R               SDC4  
+
 
 #define MOTOR1_2                PDC5                 
-#define MOTOR2_2                PDC6   
+#define MOTOR2_2                PDC6
+#define MOTOR1_2R               SDC5                 
+#define MOTOR2_2R               SDC6  
 
 #define MOTOR1_3                PDC2                 
 #define MOTOR2_3                PDC1
+#define MOTOR1_3R               SDC5                 
+#define MOTOR2_3R               SDC6  
 
 /* LEDs */
 #define TRIS_LED1               TRISBbits.TRISB15
@@ -71,20 +78,32 @@
 #define CS3_1                   LATDbits.LATD10
 #define CS4_1                   LATDbits.LATD9
 #define CS5_1                   LATDbits.LATD8
-#define CS6_1                   LATAbits.LATAA5
+#define CS6_1                   LATAbits.LATA15
+#define ODC_CS1_1               ODCDbits.ODCD0
+#define ODC_CS2_1               ODCDbits.ODCD11
+#define ODC_CS3_1               ODCDbits.ODCD10
+#define ODC_CS4_1               ODCDbits.ODCD9
+#define ODC_CS5_1               ODCDbits.ODCD8
+#define ODC_CS6_1               ODCAbits.ODCA15
 
-#define TRIS_CS1_2              TRISFbits.TRISF4
+#define TRIS_CS1_2              TRISAbits.TRISA0
 #define TRIS_CS2_2              TRISDbits.TRISD15
 #define TRIS_CS3_2              TRISDbits.TRISD14
 #define TRIS_CS4_2              TRISFbits.TRISF12
 #define TRIS_CS5_2              TRISFbits.TRISF13
 #define TRIS_CS6_2              TRISAbits.TRISA1
-#define CS1_2                   LATFbits.LATF4
+#define CS1_2                   LATAbits.LATA0
 #define CS2_2                   LATDbits.LATD15
 #define CS3_2                   LATDbits.LATD14
 #define CS4_2                   LATFbits.LATF12
 #define CS5_2                   LATFbits.LATF13
 #define CS6_2                   LATAbits.LATA1
+#define ODC_CS1_2               ODCAbits.ODCA0
+#define ODC_CS2_2               ODCDbits.ODCD15
+#define ODC_CS3_2               ODCDbits.ODCD14
+#define ODC_CS4_2               ODCFbits.ODCF12
+#define ODC_CS5_2               ODCFbits.ODCF13
+#define ODC_CS6_2               ODCAbits.ODCA1
 
 #define TRIS_CS1_3              TRISGbits.TRISG15
 #define TRIS_CS2_3              TRISGbits.TRISG13
@@ -98,11 +117,17 @@
 #define CS4_3                   LATGbits.LATG14
 #define CS5_3                   LATGbits.LATG0
 #define CS6_3                   LATGbits.LATG1
+#define ODC_CS1_3               ODCGbits.ODCG15
+#define ODC_CS2_3               ODCGbits.ODCG13
+#define ODC_CS3_3               ODCGbits.ODCG12
+#define ODC_CS4_3               ODCGbits.ODCG14
+#define ODC_CS5_3               ODCGbits.ODCG0
+#define ODC_CS6_3               ODCGbits.ODCG1
 
 
 /* Reset Pins */
-#define TRIS_RESET_1            TRISCbits.TRISC15
-#define RESET_1                 LATCbits.LATC15
+#define TRIS_RESET_1            TRISAbits.TRISA14
+#define RESET_1                 LATAbits.LATA14
 
 #define TRIS_RESET_2            TRISAbits.TRISA10
 #define RESET_2                 LATAbits.LATA10

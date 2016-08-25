@@ -18,7 +18,7 @@ CircularBuffer *uart_CB_Point;
 CircularBuffer *spi_CB_Point;
 CircularBuffer *can_CB_Point;
 
-uint16_t SPI1RxBuffA[16];
+uint16_t SPI2RxBuffA[16];
 uint16_t BufferB[8];
 __eds__ uint16_t Ecan1Rx[12][8] __attribute__((eds, space(dma)));
 ADCBuffer *ADCBuffPoint;
@@ -81,11 +81,11 @@ void DMA2_SPI_Transfer(uint16_t size, uint16_t *SendBuffer)
 
 	DMA2CNT = (size - 1); //16 transfers
 	DMA2REQ = 0x0A;
-	DMA2PAD = (volatile uint16_t) & SPI1BUF;
+	DMA2PAD = (volatile uint16_t) & SPI2BUF;
 	DMA2STAL = (uint16_t) SendBuffer;
 	DMA2STAH = 0;
 
-	SPI1BUF = *SendBuffer;
+	SPI2BUF = *SendBuffer;
 
 	IFS1bits.DMA2IF = 0; // Clear DMA interrupt
 	IEC1bits.DMA2IE = 1; // Enable DMA interrupt
@@ -105,8 +105,8 @@ void DMA3_SPI_Enable_RX(CircularBuffer *cB)
 
 	DMA3CNT = 0;
 	DMA3REQ = 0x0A;
-	DMA3PAD = (volatile uint16_t) & SPI1BUF;
-	DMA3STAL = __builtin_dmaoffset(&SPI1RxBuffA);
+	DMA3PAD = (volatile uint16_t) & SPI2BUF;
+	DMA3STAL = __builtin_dmaoffset(&SPI2RxBuffA);
 	DMA3STAH = 0x0000;
 
 	IFS2bits.DMA3IF = 0; // Clear DMA interrupt
@@ -169,7 +169,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA2Interrupt(void)
 void __attribute__((__interrupt__, no_auto_psv)) _DMA3Interrupt(void)
 {
 	//Think about a global interrupt disable here as CB is non reentrant...
-	CB_WriteByte(spi_CB_Point, SPI1RxBuffA[0]);
+	CB_WriteByte(spi_CB_Point, SPI2RxBuffA[0]);
 	IFS2bits.DMA3IF = 0;
 }
 

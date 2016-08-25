@@ -6,7 +6,7 @@
 
 _FOSCSEL(FNOSC_FRC & IESO_OFF);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_NONE);
-_FPOR(ALTI2C1_ON)
+_FPOR(ALTI2C1_OFF & ALTI2C2_ON)
 _FWDT(FWDTEN_OFF);
 _FICD(ICS_PGD1 & JTAGEN_OFF);
 
@@ -19,6 +19,9 @@ void PinInit(void);
 void EventCheckInit(void *eventCallback);
 void ADCInit(void);
 
+#define PPSIn(fn,pin)    iPPSInput(IN_FN_PPS##fn,IN_PIN_PPS##pin)
+#define PPSOut(fn,pin)    iPPSOutput(OUT_PIN_PPS##pin,OUT_FN_PPS##fn)
+
 void (*eventCallbackFcn)(void);
 
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback) {
@@ -27,9 +30,14 @@ void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, vo
     PinInit();
     MotorInit();
     UART2Init();
-   // ADCInit();
+    // ADCInit();
+
+
+    DMA2REQbits.FORCE = 1;
+    while (DMA2REQbits.FORCE == 1);
 
     DMA1_UART2_Enable_RX(cB);
+    //DMA3_SPI_Enable_RX(spi_cB);
     DMA6_ADC_Enable(ADBuff);
 
 
@@ -39,19 +47,20 @@ void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, vo
 
 void MotorInit() {
     /* Set PWM Period on Primary Time Base */
-    PTPER = 1000;
+    PTPER = 1400;
     /* Set Duty Cycles */
 
     /* Set Dead Time Values */
     DTR1 = DTR2 = DTR3 = DTR4 = DTR5 = DTR6 = 0;
     ALTDTR1 = ALTDTR2 = ALTDTR3 = ALTDTR4 = ALTDTR5 = ALTDTR6 = 0;
     /* Set PWM Mode to Complementary */
-    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xC000;
+    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xCC00; //complimentary >0xC000;
     /* Set Primary Time Base, Edge-Aligned Mode and Independent Duty Cycles */
-    PWMCON1 =  PWMCON3 = PWMCON4 = PWMCON5 = PWMCON6 = 0x0000;
+    PWMCON1 = PWMCON2 = PWMCON3 = PWMCON4 = PWMCON5 = PWMCON6 = 0x0000;
     /* Configure Faults */
-    FCLCON1 =  FCLCON3 = FCLCON4 = FCLCON5 = FCLCON6 = 0x0003;
+    FCLCON1 = FCLCON2 = FCLCON3 = FCLCON4 = FCLCON5 = FCLCON6 = 0x0003;
     /* 1:1 Prescaler */
+    PTCON2 = 0x0000;
     /* Enable PWM Module */
     PTCON = 0x8000;
 
@@ -63,7 +72,7 @@ void UART2Init(void) {
     U2MODEbits.ABAUD = 0; // Auto-baud disabled
     U2MODEbits.BRGH = 1; // High speed UART mode...
     U2BRG = 18; //455 for 9600,227 for 19200, 113 for 38400,  37 for 115200 on BRGH 0, 460800 on BRGH 1, 921600 = 19
-    //BRGH = 0, BRG = 18 for 230400
+    //BRGH = 0, BRG = 18 for 230400, BRG = 17 BRGH = 0 for 25000
     U2STAbits.UTXISEL0 = 0; // int on last character shifted out tx register
     U2STAbits.UTXISEL1 = 0; // int on last character shifted out tx register
     U2STAbits.URXISEL = 0; // Interrupt after one RX character is received
@@ -89,6 +98,19 @@ void ClockInit(void) {
 }
 
 void PinInit(void) {
+
+    U1PWRC = 0; // USB OTG module disabled
+    U1OTGCON = 0; // VBUS line off
+    U1PWMCON = 0; // Counter is disabled
+    U1CNFG2 = 0; // On-chip Boost Controller off
+    U1CNFG2bits.UVBUSDIS = 1;
+    U1CNFG2bits.UVCMPDIS = 1;
+    
+    PMCON = 0;
+    PMAEN =0;
+    I2C1CON = 0;
+    I2C2CON = 0;
+
     //Right now no analog peripherals are being used, so we let digital
     //peripherals take over.
     ANSELA = 0;
@@ -97,66 +119,97 @@ void PinInit(void) {
     ANSELD = 0;
     ANSELE = 0;
     ANSELG = 0;
-    
+
     /* initialize LED pins as outputs */
     TRIS_LED1 = 0;
     TRIS_LED2 = 0;
     TRIS_LED3 = 0;
     TRIS_LED4 = 0;
-    
+
     /* initialize CS pins as outputs */
-    TRIS_CS1_1 = 0;
-    TRIS_CS2_1 = 0;
-    TRIS_CS3_1 = 0;
-    TRIS_CS4_1 = 0;
-    TRIS_CS5_1 = 0;
-    TRIS_CS6_1 = 0;
-    
-    TRIS_CS1_2 = 0;
-    TRIS_CS2_2 = 0;
-    TRIS_CS3_2 = 0;
-    TRIS_CS4_2 = 0;
-    TRIS_CS5_2 = 0;
-    TRIS_CS6_2 = 0;
-    
-    TRIS_CS1_3 = 0;
-    TRIS_CS2_3 = 0;
-    TRIS_CS3_3 = 0;
-    TRIS_CS4_3 = 0;
-    TRIS_CS5_3 = 0;
-    TRIS_CS6_3 = 0;
-    
+    TRIS_CS1_1 = TRIS_CS2_1 = TRIS_CS3_1 = TRIS_CS4_1 = TRIS_CS5_1 = TRIS_CS6_1 = 0;
+    ODC_CS1_1 = ODC_CS2_1 = ODC_CS3_1 = ODC_CS4_1 = ODC_CS5_1 = ODC_CS6_1 = 1;
+    CS1_1 = CS2_1 = CS3_1 = CS4_1 = CS5_1 = CS6_1 = 1;
+
+    TRIS_CS1_2 = TRIS_CS2_2 = TRIS_CS3_2 = TRIS_CS4_2 = TRIS_CS5_2 = TRIS_CS6_2 = 0;
+    ODC_CS1_2 = ODC_CS2_2 = ODC_CS3_2 = ODC_CS4_2 = ODC_CS5_2 = ODC_CS6_2 = 1;
+    CS1_2 = CS2_2 = CS3_2 = CS4_2 = CS5_2 = CS6_2 = 1;
+
+    TRIS_CS1_3 = TRIS_CS2_3 = TRIS_CS3_3 = TRIS_CS4_3 = TRIS_CS5_3 = TRIS_CS6_3 = 0;
+    ODC_CS1_3 = ODC_CS2_3 = ODC_CS3_3 = ODC_CS4_3 = ODC_CS5_3 = ODC_CS6_3 = 1;
+    CS1_3 = CS2_3 = CS3_3 = CS4_3 = CS5_3 = CS6_3 = 1;
+
     /* initialize switch pins as inputs */
     TRIS_SW1_1 = 1;
     TRIS_SW2_1 = 1;
     TRIS_SW3_1 = 1;
     TRIS_SW4_1 = 1;
-    
+
     TRIS_SW1_2 = 1;
     TRIS_SW2_2 = 1;
     TRIS_SW3_2 = 1;
     TRIS_SW4_2 = 1;
-    
+
     TRIS_SW1_3 = 1;
     TRIS_SW2_3 = 1;
     TRIS_SW3_3 = 1;
     TRIS_SW4_3 = 1;
-    
-//    //Set up Change Notify Interrupt
-//    //These correspond to your change hall effect pins.
-//    CNENCbits.CNIEC13 = 1; // Enable RC14 pin for interrupt detection
 
+    TRIS_RESET_1 = TRIS_RESET_2 = TRIS_RESET_3 = 0;
+    RESET_1 = RESET_2 = RESET_3 = 1;
+
+    //    //Set up Change Notify Interrupt
+    //    //These correspond to your change hall effect pins.
+    //    CNENCbits.CNIEC13 = 1; // Enable RC14 pin for interrupt detection
+
+    //CNPUFbits.CNPUF4 = 1;
+    ODCFbits.ODCF4 = 0;
+    ODCFbits.ODCF5 = 0;
+    //CNPUCbits.CNPUC13 = 1;
+    
     IEC1bits.CNIE = 1; // Enable CN interrupts
     IFS1bits.CNIF = 0; // Reset CN interrupt
 
-    //Unlock PPS Registers
-    __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
 
-    OUT_PIN_PPS_RP67= OUT_FN_PPS_U2TX; //U2Tx
-    IN_FN_PPS_U2RX = IN_PIN_PPS_RP69; //U2Rx
+    //Unlock PPS Registers
+    TRISDbits.TRISD6 = 0;
+    TRISDbits.TRISD1 = 0;
+    TRISDbits.TRISD13 = 1; //sdi
+
+    TRISFbits.TRISF3 = 0;
+    TRISFbits.TRISF4 = 0;
+    TRISFbits.TRISF5 = 1; //sdi
+
+    //__builtin_write_OSCCONL(OSCCON & ~(1 << 6));
+    //OUT_PIN_PPS_RP67 = OUT_FN_PPS_U2TX; //U2Tx
+    //IN_FN_PPS_U2RX = IN_PIN_PPS_RP69; //U2Rx
+
+    PPSOut(_U2TX, _RP67); // Connect UART1 TX output to RP67 pin
+    PPSIn(_U2RX, _RP69); // Connect UART1 TX output to RP67 pin
+    PPSOut(_SDO1, _RP70); // Connect UART1 TX output to RP67 pin
+    PPSOut(_SCK1, _RP65); // Connect Comparator 1 output to RP118 pin
+    PPSIn(_SDI1, _RPI77); // Connect UART2 RX input to RPI62 pin
+    PPSOut(_SDO3, _RP99); // Connect UART1 TX output to RP67 pin
+    PPSOut(_SCK3, _RP100); // Connect Comparator 1 output to RP118 pin
+    PPSIn(_SDI3, _RP101); // Connect UART2 RX input to RPI62 pin
+    //    PPSIn(_INT2, _RPI75); // Connect External Interrupt 2 input to RPI75 pin
+    //
+    //    _RP70R = 0; // Default Pin output
+    //    _RP65R = 0; // Default Pin output
+    //    OUT_PIN_PPS_RP70 = OUT_FN_PPS_SDO1;
+    //    OUT_PIN_PPS_RP65 = OUT_FN_PPS_SCK1;
+    //    IN_FN_PPS_SDI1 = IN_PIN_PPS_RPI77;
+    //
+    //
+    //    _RP99R = 0; // Default Pin output
+    //    _RP100R = 0; // Default Pin output
+    //    OUT_PIN_PPS_RP99 = OUT_FN_PPS_SDO3;
+    //    OUT_PIN_PPS_RP100 = OUT_FN_PPS_SCK3;
+    //    IN_FN_PPS_SDI3 = IN_PIN_PPS_RP101;
+
 
     //Lock PPS Registers
-    __builtin_write_OSCCONL(OSCCON | (1 << 6));
+    // __builtin_write_OSCCONL(OSCCON | (1 << 6));
 
 }
 
@@ -193,7 +246,7 @@ void ADCInit(void) {
     //ANSELBbits.ANSB15 = 1; //AN15
     //ANSELBbits.ANSB13 = 1; //AN13
     //ANSELAbits.ANSA7 = 1; //AN23
-    
+
     //Setup ADC1 for Channel 0-3 sampling
     AD1CON2bits.VCFG = 0;
     AD1CON1bits.FORM = 0; //Data Output Format : Integer Output
@@ -228,10 +281,10 @@ void ADCInit(void) {
     AD1CSSL = 0x0000;
     AD1CSSH = 0x0000;
     //AD1CSSLbits.CSS1 = 1;  //PVDD MONITORING
-    AD1CSSLbits.CSS15 = 1; 
+    AD1CSSLbits.CSS15 = 1;
     AD1CSSLbits.CSS14 = 1;
     AD1CSSLbits.CSS13 = 1;
-   //AD1CSSLbits.CSS9 = 1;
+    //AD1CSSLbits.CSS9 = 1;
     //AD1CSSLbits.CSS11 = 1; 
     AD1CSSHbits.CSS23 = 1; //battery sense
     //AD1CSSLbits.CSS13 = 1;

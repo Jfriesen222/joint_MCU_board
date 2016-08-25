@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c DMA_Transfer.c CircularBuffer.c I2CdsPIC.c Nmea0183.c NMEAProtocol.c Conversions.c MCU_Board.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c DMA_Transfer.c CircularBuffer.c I2CdsPIC.c Nmea0183.c NMEAProtocol.c Conversions.c MCU_Board.c LS7366R_SPI.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/DMA_Transfer.o ${OBJECTDIR}/CircularBuffer.o ${OBJECTDIR}/I2CdsPIC.o ${OBJECTDIR}/Nmea0183.o ${OBJECTDIR}/NMEAProtocol.o ${OBJECTDIR}/Conversions.o ${OBJECTDIR}/MCU_Board.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/DMA_Transfer.o.d ${OBJECTDIR}/CircularBuffer.o.d ${OBJECTDIR}/I2CdsPIC.o.d ${OBJECTDIR}/Nmea0183.o.d ${OBJECTDIR}/NMEAProtocol.o.d ${OBJECTDIR}/Conversions.o.d ${OBJECTDIR}/MCU_Board.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/DMA_Transfer.o ${OBJECTDIR}/CircularBuffer.o ${OBJECTDIR}/I2CdsPIC.o ${OBJECTDIR}/Nmea0183.o ${OBJECTDIR}/NMEAProtocol.o ${OBJECTDIR}/Conversions.o ${OBJECTDIR}/MCU_Board.o ${OBJECTDIR}/LS7366R_SPI.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/DMA_Transfer.o.d ${OBJECTDIR}/CircularBuffer.o.d ${OBJECTDIR}/I2CdsPIC.o.d ${OBJECTDIR}/Nmea0183.o.d ${OBJECTDIR}/NMEAProtocol.o.d ${OBJECTDIR}/Conversions.o.d ${OBJECTDIR}/MCU_Board.o.d ${OBJECTDIR}/LS7366R_SPI.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/DMA_Transfer.o ${OBJECTDIR}/CircularBuffer.o ${OBJECTDIR}/I2CdsPIC.o ${OBJECTDIR}/Nmea0183.o ${OBJECTDIR}/NMEAProtocol.o ${OBJECTDIR}/Conversions.o ${OBJECTDIR}/MCU_Board.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/DMA_Transfer.o ${OBJECTDIR}/CircularBuffer.o ${OBJECTDIR}/I2CdsPIC.o ${OBJECTDIR}/Nmea0183.o ${OBJECTDIR}/NMEAProtocol.o ${OBJECTDIR}/Conversions.o ${OBJECTDIR}/MCU_Board.o ${OBJECTDIR}/LS7366R_SPI.o
 
 # Source Files
-SOURCEFILES=main.c DMA_Transfer.c CircularBuffer.c I2CdsPIC.c Nmea0183.c NMEAProtocol.c Conversions.c MCU_Board.c
+SOURCEFILES=main.c DMA_Transfer.c CircularBuffer.c I2CdsPIC.c Nmea0183.c NMEAProtocol.c Conversions.c MCU_Board.c LS7366R_SPI.c
 
 
 CFLAGS=
@@ -144,6 +144,13 @@ ${OBJECTDIR}/MCU_Board.o: MCU_Board.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  MCU_Board.c  -o ${OBJECTDIR}/MCU_Board.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/MCU_Board.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/MCU_Board.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
+${OBJECTDIR}/LS7366R_SPI.o: LS7366R_SPI.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/LS7366R_SPI.o.d 
+	@${RM} ${OBJECTDIR}/LS7366R_SPI.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  LS7366R_SPI.c  -o ${OBJECTDIR}/LS7366R_SPI.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/LS7366R_SPI.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1  -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/LS7366R_SPI.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -200,6 +207,13 @@ ${OBJECTDIR}/MCU_Board.o: MCU_Board.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/MCU_Board.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  MCU_Board.c  -o ${OBJECTDIR}/MCU_Board.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/MCU_Board.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/MCU_Board.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
+	
+${OBJECTDIR}/LS7366R_SPI.o: LS7366R_SPI.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/LS7366R_SPI.o.d 
+	@${RM} ${OBJECTDIR}/LS7366R_SPI.o 
+	${MP_CC} $(MP_EXTRA_CC_PRE)  LS7366R_SPI.c  -o ${OBJECTDIR}/LS7366R_SPI.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/LS7366R_SPI.o.d"      -mno-eds-warn  -g -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -O0 -msmart-io=1 -Wall -msfr-warn=off  
+	@${FIXDEPS} "${OBJECTDIR}/LS7366R_SPI.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 endif
 
