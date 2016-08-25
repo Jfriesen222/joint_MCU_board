@@ -1,0 +1,110 @@
+/*
+ * File:   LS7366R_SPI.c
+ * Author: Jeff
+ *
+ * Created on August 10, 2016, 2:06 PM
+ */
+
+
+#include "xc.h"
+
+#include "LS7366R_SPI.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <spi.h>
+#include <dma.h>
+#include <xc.h>
+
+tripSPIdata cntData1;
+tripSPIdata cntData2;
+tripSPIdata cntData3;
+tripSPIdata cntData4;
+
+unsigned int config1slow = ENABLE_SCK_PIN & // Internal Serial Clock is Enabled
+        ENABLE_SDO_PIN & // SDO2 pin is controlled by the module
+        SPI_MODE16_OFF & // Communication is 0=8-bits, 1=16bits wide
+        SPI_SMP_OFF & // Input Data is Sampled at the Middle of Data Output Time
+        SPI_CKE_ON & // Transmit happens from active clock state to idle clock state
+        SLAVE_ENABLE_OFF & // Slave Select Disabled
+        CLK_POL_ACTIVE_HIGH & // Idle state for clock is low, active is high
+        MASTER_ENABLE_ON & // Master Mode
+        SEC_PRESCAL_2_1 &
+        PRI_PRESCAL_4_1 // SPI CLK at 5MHz
+        ;
+
+
+// This contains the parameters to be configured in the SPIxCON2 register
+unsigned int config2 = FRAME_ENABLE_OFF & // Frame SPI support Disable
+        FIFO_BUFFER_DISABLE // FIFO buffer disabled
+        ;
+
+// This contains the parameters to be configured in the SPIxSTAT register
+unsigned int config3 = SPI_ENABLE & // Enable module
+        SPI_IDLE_CON & // Continue module operation in idle mode
+        SPI_RX_OVFLOW_CLR // Clear receive overflow bit
+        ;
+
+
+void config_spi_slow() {
+    CloseSPI1();
+    CloseSPI2();
+    CloseSPI3();
+    OpenSPI1(config1slow, config2, config3);
+    OpenSPI2(config1slow, config2, config3);
+    OpenSPI3(config1slow, config2, config3);
+}
+
+
+void setQuadX4() {
+    // Initialize encoder 1
+    //    Clock division factor: 0
+    //    Negative index input
+    //    free-running count mode
+    //    x4 quatrature count mode (four counts per quadrature cycle)
+    // NOTE: For more information on commands, see datasheet
+    write_SPI(WRITE_MDR0, &cntData1); // Write to MDR0      
+    write_SPI(QUADRX4, &cntData1); // Configure to 4 byte mode
+}
+
+void readEnc(EncoderCts *EncVals) {
+    // Initialize temporary variables for SPI read
+    write_SPI(READ_CNTR, &cntData1); // Request count
+    write_SPI(0x00, &cntData1); // Read highest order byte
+    write_SPI(0x00, &cntData2);
+    write_SPI(0x00, &cntData3);
+    write_SPI(0x00, &cntData4); // Read lowest order byte
+
+    // Calculate encoder count
+    long int count_value;
+    count_value = (cntData1.data1 << 8) + cntData2.data1;
+    count_value = (count_value << 8) + cntData3.data1;
+    count_value = (count_value << 8) + cntData4.data1;
+    EncVals->cts1 = count_value;
+    count_value = (cntData1.data2 << 8) + cntData2.data2;
+    count_value = (count_value << 8) + cntData3.data2;
+    count_value = (count_value << 8) + cntData4.data2;
+    EncVals->cts2 = count_value;
+    count_value = (cntData1.data3 << 8) + cntData2.data3;
+    count_value = (count_value << 8) + cntData3.data3;
+    count_value = (count_value << 8) + cntData4.data3;
+    EncVals->cts3 = count_value;
+}
+
+void write_SPI(int command, tripSPIdata *datas) {
+    int bufVal;
+    bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    bufVal = SPI2BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    bufVal = SPI3BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    SPI1BUF = command; // write the data out to the SPI peripheral
+    SPI2BUF = command; // write the data out to the SPI peripheral
+    SPI3BUF = command; // write the data out to the SPI peripheral
+    while (!SPI1STATbits.SPIRBF) // wait for the data to be sent out
+        ;
+    while (!SPI2STATbits.SPIRBF)
+        ;
+    while (!SPI3STATbits.SPIRBF)
+        ;
+    datas->data1 = SPI1BUF;
+    datas->data2 = SPI3BUF;
+    datas->data3 = SPI2BUF;
+}
