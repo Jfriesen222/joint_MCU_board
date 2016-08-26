@@ -107,8 +107,11 @@ typedef struct {
 
 void config_spi_slow();
 void setQuadX4();
+void writeDTRtoZeros();
+void setCNTRtoDTR();
 void readEnc(EncoderCts *EncVals);
-void write_SPI(int command, tripSPIdata *datas);
+void read_SPI(int command, tripSPIdata *datas);
+void write_SPI(int command);
 
 
 

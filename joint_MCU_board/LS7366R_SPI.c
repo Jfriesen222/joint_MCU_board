@@ -29,7 +29,7 @@ unsigned int config1slow = ENABLE_SCK_PIN & // Internal Serial Clock is Enabled
         CLK_POL_ACTIVE_HIGH & // Idle state for clock is low, active is high
         MASTER_ENABLE_ON & // Master Mode
         SEC_PRESCAL_2_1 &
-        PRI_PRESCAL_4_1 // SPI CLK at 5MHz
+        PRI_PRESCAL_16_1 // SPI CLK at 5MHz
         ;
 
 
@@ -62,17 +62,30 @@ void setQuadX4() {
     //    free-running count mode
     //    x4 quatrature count mode (four counts per quadrature cycle)
     // NOTE: For more information on commands, see datasheet
-    write_SPI(WRITE_MDR0, &cntData1); // Write to MDR0      
-    write_SPI(QUADRX4, &cntData1); // Configure to 4 byte mode
+    write_SPI(WRITE_MDR0); // Write to MDR0      
+    write_SPI(QUADRX4); // Configure to 4 byte mode
+}
+
+void writeDTRtoZeros() {
+    write_SPI(WRITE_DTR);    
+    // Load data
+    write_SPI(0x00);  // Highest order byte
+    write_SPI(0x00);           
+    write_SPI(0x00);           
+    write_SPI(0x00);  // lowest order byte
+}
+
+void setCNTRtoDTR() {
+    write_SPI(LOAD_CNTR); 
 }
 
 void readEnc(EncoderCts *EncVals) {
     // Initialize temporary variables for SPI read
-    write_SPI(READ_CNTR, &cntData1); // Request count
-    write_SPI(0x00, &cntData1); // Read highest order byte
-    write_SPI(0x00, &cntData2);
-    write_SPI(0x00, &cntData3);
-    write_SPI(0x00, &cntData4); // Read lowest order byte
+    write_SPI(READ_CNTR); // Request count
+    read_SPI(0x00, &cntData1); // Read highest order byte
+    read_SPI(0x00, &cntData2);
+    read_SPI(0x00, &cntData3);
+    read_SPI(0x00, &cntData4); // Read lowest order byte
 
     // Calculate encoder count
     long int count_value;
@@ -90,7 +103,7 @@ void readEnc(EncoderCts *EncVals) {
     EncVals->cts3 = count_value;
 }
 
-void write_SPI(int command, tripSPIdata *datas) {
+void read_SPI(int command, tripSPIdata *datas) {
     int bufVal;
     bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
     bufVal = SPI2BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
@@ -98,13 +111,19 @@ void write_SPI(int command, tripSPIdata *datas) {
     SPI1BUF = command; // write the data out to the SPI peripheral
     SPI2BUF = command; // write the data out to the SPI peripheral
     SPI3BUF = command; // write the data out to the SPI peripheral
-    while (!SPI1STATbits.SPIRBF) // wait for the data to be sent out
-        ;
-    while (!SPI2STATbits.SPIRBF)
-        ;
-    while (!SPI3STATbits.SPIRBF)
-        ;
+    while ((!SPI1STATbits.SPIRBF)|(!SPI2STATbits.SPIRBF)|(!SPI3STATbits.SPIRBF)) ; // wait for the data to be sent out
     datas->data1 = SPI1BUF;
     datas->data2 = SPI3BUF;
     datas->data3 = SPI2BUF;
+}
+
+void write_SPI(int command){
+    int bufVal;
+    bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    bufVal = SPI2BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    bufVal = SPI3BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    SPI1BUF = command; // write the data out to the SPI peripheral
+    SPI2BUF = command; // write the data out to the SPI peripheral
+    SPI3BUF = command; // write the data out to the SPI peripheral
+   while ((!SPI1STATbits.SPIRBF)|(!SPI2STATbits.SPIRBF)|(!SPI3STATbits.SPIRBF)) ; // wait for the data to be sent out
 }

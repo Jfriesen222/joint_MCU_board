@@ -42,6 +42,10 @@
 #define TRIS_SW2_1              TRISAbits.TRISA4
 #define TRIS_SW3_1              TRISAbits.TRISA3
 #define TRIS_SW4_1              TRISAbits.TRISA2
+#define CNPU_SW1_1              CNPUAbits.CNPUA5
+#define CNPU_SW2_1              CNPUAbits.CNPUA4
+#define CNPU_SW3_1              CNPUAbits.CNPUA3
+#define CNPU_SW4_1              CNPUAbits.CNPUA2
 #define SW1_1                   PORTAbits.RA5
 #define SW2_1                   PORTAbits.RA4
 #define SW3_1                   PORTAbits.RA3
@@ -51,6 +55,10 @@
 #define TRIS_SW2_2              TRISBbits.TRISB10
 #define TRIS_SW3_2              TRISBbits.TRISB9
 #define TRIS_SW4_2              TRISBbits.TRISB8
+#define CNPU_SW1_2              CNPUBbits.CNPUB11
+#define CNPU_SW2_2              CNPUBbits.CNPUB10
+#define CNPU_SW3_2              CNPUBbits.CNPUB9
+#define CNPU_SW4_2              CNPUBbits.CNPUB8
 #define SW1_2                   PORTBbits.RB11
 #define SW2_2                   PORTBbits.RB10
 #define SW3_2                   PORTBbits.RB9
@@ -60,10 +68,14 @@
 #define TRIS_SW2_3              TRISFbits.TRISF0
 #define TRIS_SW3_3              TRISAbits.TRISA7
 #define TRIS_SW4_3              TRISAbits.TRISA6
-#define SW1_3                   TRISFbits.RF1
-#define SW2_3                   TRISFbits.RF0
-#define SW3_3                   TRISAbits.RA7
-#define SW4_3                   TRISAbits.RA6
+#define CNPU_SW1_3              CNPUFbits.CNPUF1
+#define CNPU_SW2_3              CNPUFbits.CNPUF0
+#define CNPU_SW3_3              CNPUAbits.CNPUA7
+#define CNPU_SW4_3              CNPUAbits.CNPUA6
+#define SW1_3                   PORTFbits.RF1
+#define SW2_3                   PORTFbits.RF0
+#define SW3_3                   PORTAbits.RA7
+#define SW4_3                   PORTAbits.RA6
 
 
 /* Chip Select */
@@ -124,6 +136,34 @@
 #define ODC_CS5_3               ODCGbits.ODCG0
 #define ODC_CS6_3               ODCGbits.ODCG1
 
+#define RL1                     0b111111111111111110
+#define RL4                     0b111111111111111101
+#define SA2                     0b111111111111111011
+#define SF2                     0b111111111111110111
+#define SA3                     0b111111111111101111
+#define SF3                     0b111111111111011111
+#define RL3                     0b111111111110111111
+#define RL6                     0b111111111101111111
+#define SA4                     0b111111111011111111
+#define SF4                     0b111111110111111111
+#define SA5                     0b111111101111111111
+#define SF5                     0b111111011111111111
+#define RL5                     0b111110111111111111
+#define RL2                     0b111101111111111111
+#define SA6                     0b111011111111111111
+#define SF6                     0b110111111111111111
+#define SA1                     0b101111111111111111
+#define SF1                     0b011111111111111111
+
+#define SF_ODD                  SF1&SF3&SF5
+#define SF_EVEN                 SF2&SF4&SF6 
+#define SA_ODD                  SA1&SA3&SA5
+#define SA_EVEN                 SA2&SA4&SA6
+#define RL_ODD                  RL1&RL3&RL5
+#define RL_EVEN                 RL2&RL4&RL6
+
+#define ALL_CS_LOW              0x0
+#define ALL_CS_HIGH             0x3FFFF
 
 /* Reset Pins */
 #define TRIS_RESET_1            TRISAbits.TRISA14
@@ -139,4 +179,4 @@
 
 
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback);
-
+void selectCS(uint32_t cs_bits);

@@ -8,7 +8,7 @@ _FOSCSEL(FNOSC_FRC & IESO_OFF);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_NONE);
 _FPOR(ALTI2C1_OFF & ALTI2C2_ON)
 _FWDT(FWDTEN_OFF);
-_FICD(ICS_PGD1 & JTAGEN_OFF);
+_FICD(ICS_PGD3 & JTAGEN_OFF);
 
 
 void UART2Init(void);
@@ -47,14 +47,14 @@ void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, vo
 
 void MotorInit() {
     /* Set PWM Period on Primary Time Base */
-    PTPER = 1400;
+    PTPER = 1500;
     /* Set Duty Cycles */
 
     /* Set Dead Time Values */
     DTR1 = DTR2 = DTR3 = DTR4 = DTR5 = DTR6 = 0;
     ALTDTR1 = ALTDTR2 = ALTDTR3 = ALTDTR4 = ALTDTR5 = ALTDTR6 = 0;
     /* Set PWM Mode to Complementary */
-    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xCC00; //complimentary >0xC000;
+    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xC000; //independent >0xCC00;
     /* Set Primary Time Base, Edge-Aligned Mode and Independent Duty Cycles */
     PWMCON1 = PWMCON2 = PWMCON3 = PWMCON4 = PWMCON5 = PWMCON6 = 0x0000;
     /* Configure Faults */
@@ -105,9 +105,9 @@ void PinInit(void) {
     U1CNFG2 = 0; // On-chip Boost Controller off
     U1CNFG2bits.UVBUSDIS = 1;
     U1CNFG2bits.UVCMPDIS = 1;
-    
+
     PMCON = 0;
-    PMAEN =0;
+    PMAEN = 0;
     I2C1CON = 0;
     I2C2CON = 0;
 
@@ -144,16 +144,28 @@ void PinInit(void) {
     TRIS_SW2_1 = 1;
     TRIS_SW3_1 = 1;
     TRIS_SW4_1 = 1;
+    CNPU_SW1_1 = 1;
+    CNPU_SW2_1 = 1;
+    CNPU_SW3_1 = 1;
+    CNPU_SW4_1 = 1;
 
     TRIS_SW1_2 = 1;
     TRIS_SW2_2 = 1;
     TRIS_SW3_2 = 1;
     TRIS_SW4_2 = 1;
+    CNPU_SW1_2 = 1;
+    CNPU_SW2_2 = 1;
+    CNPU_SW3_2 = 1;
+    CNPU_SW4_2 = 1;
 
     TRIS_SW1_3 = 1;
     TRIS_SW2_3 = 1;
     TRIS_SW3_3 = 1;
     TRIS_SW4_3 = 1;
+    CNPU_SW1_3 = 1;
+    CNPU_SW2_3 = 1;
+    CNPU_SW3_3 = 1;
+    CNPU_SW4_3 = 1;
 
     TRIS_RESET_1 = TRIS_RESET_2 = TRIS_RESET_3 = 0;
     RESET_1 = RESET_2 = RESET_3 = 1;
@@ -166,7 +178,7 @@ void PinInit(void) {
     ODCFbits.ODCF4 = 0;
     ODCFbits.ODCF5 = 0;
     //CNPUCbits.CNPUC13 = 1;
-    
+
     IEC1bits.CNIE = 1; // Enable CN interrupts
     IFS1bits.CNIF = 0; // Reset CN interrupt
 
@@ -304,4 +316,27 @@ void EventCheckInit(void *eventCallback) {
 void __attribute__((__interrupt__, no_auto_psv)) _T7Interrupt(void) {
     eventCallbackFcn();
     IFS3bits.T7IF = 0; // Clear Timer1 Interrupt Flag
+}
+
+void selectCS(uint32_t cs_bits){
+    uint32_t i;
+    i = 1;
+    CS1_1 = (i)&(cs_bits);
+    CS2_1 = ((i<<1)&(cs_bits))>>1;
+    CS3_1 = ((i<<2)&(cs_bits))>>2;
+    CS4_1 = ((i<<3)&(cs_bits))>>3;
+    CS5_1 = ((i<<4)&(cs_bits))>>4;
+    CS6_1 = ((i<<5)&(cs_bits))>>5; 
+    CS1_2 = ((i<<6)&(cs_bits))>>6;
+    CS2_2 = ((i<<7)&(cs_bits))>>7;
+    CS3_2 = ((i<<8)&(cs_bits))>>8;
+    CS4_2 = ((i<<9)&(cs_bits))>>9;
+    CS5_2 = ((i<<10)&(cs_bits))>>10;
+    CS6_2 = ((i<<11)&(cs_bits))>>11;
+    CS1_3 = ((i<<12)&(cs_bits))>>12;
+    CS2_3 = ((i<<13)&(cs_bits))>>13;
+    CS3_3 = ((i<<14)&(cs_bits))>>14;
+    CS4_3 = ((i<<15)&(cs_bits))>>15;
+    CS5_3 = ((i<<16)&(cs_bits))>>16;
+    CS6_3 = ((i<<17)&(cs_bits))>>17;  
 }
