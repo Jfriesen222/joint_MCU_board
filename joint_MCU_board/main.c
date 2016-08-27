@@ -34,6 +34,8 @@ EncoderCts EncCts4;
 EncoderCts EncCts5;
 EncoderCts EncCts6;
 
+Robot_Encoders robot_encoders;
+
 uint16_t events;
 bool controller;
 ADCBuffer ADCBuff;
@@ -69,10 +71,10 @@ int main(void) {
     CB_Init(&uartBuffer, uartBuf, 32);
     CB_Init(&spiBuffer, (uint8_t *) spiBuf, 128);
     InitBoard(&ADCBuff, &uartBuffer, &spiBuffer, EventChecker);
-    
+
     config_spi_slow();
-    
-    
+
+
     selectCS(ALL_CS_LOW);
     setQuadX4();
     selectCS(ALL_CS_HIGH);
@@ -80,12 +82,12 @@ int main(void) {
     selectCS(ALL_CS_LOW);
     writeDTRtoZeros();
     selectCS(ALL_CS_HIGH);
-    
-    selectCS(0);
+
+    selectCS(ALL_CS_LOW);
     setCNTRtoDTR();
-    selectCS(0x3FFFF);
-    
-    
+    selectCS(ALL_CS_HIGH);
+
+
 
 
 
@@ -124,39 +126,17 @@ int main(void) {
             float freq;
             freq = 200.0;
             amplitude = 100;
-            MOTOR1_3 = (int) (amplitude * sin(iii / freq) + PTPER/2);
-            MOTOR2_3 = (int) (amplitude * sin(iii / freq) + PTPER/2);
-            MOTOR1_1 = (int) (amplitude * sin(iii / freq) + PTPER/2);
-            MOTOR2_1 = (int) (amplitude * sin(iii / freq) + PTPER/2);
-            MOTOR1_2 = (int) (amplitude * sin(iii / freq) + PTPER/2);
-            MOTOR2_2 = (int) (amplitude * sin(iii / freq) + PTPER/2);
-            if (iii % 500 == 0) {
-                jjj++;
-            }
+            MOTOR1_3 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
+            MOTOR2_3 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
+            MOTOR1_1 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
+            MOTOR2_1 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
+            MOTOR1_2 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
+            MOTOR2_2 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
 
             if (iii % 100 == 0) {
-                //size = sprintf((char *) out, "%i,%i,%i,%i,%i,%i,%i,\r\n", (int) (10000 * quaternion[0]), (int) (10000 * quaternion[1]), (int) (10000 * quaternion[2]), (int) (10000 * quaternion[3]), (int) flex1, (int) flex2, (int) ADCBuff.Adc1Data[3]);
-                //size = sprintf((char *) out, "%5i  %5i  %5i  %5i  %5i  %5i  %5i  %5i  %5i\r\n", (int) (10 * imuData.accelX), (int) (10 * imuData.accelY), (int) (10 * imuData.accelZ), (int) (imuData.gyroX), (int) (imuData.gyroY), (int) (imuData.gyroZ), (int) (10 * imuData.magX), (int) (10 * imuData.magY), (int) (10 * imuData.magZ));
-//                CS1_1 = CS1_2  = CS1_3 = 0;
-//                readEnc(&EncCts1);
-//                CS1_1 = CS1_2  = CS1_3 = 1;
-//                CS2_1 = CS2_2  = CS2_3 = 0;
-//                readEnc(&EncCts2);
-//                CS2_1 = CS2_2  = CS2_3 = 1;
-//                CS3_1 = CS3_2  = CS3_3 = 0;
-//                readEnc(&EncCts3);
-//                CS3_1 = CS3_2  = CS3_3 = 1;
-//                CS4_1 = CS4_2  = CS4_3 = 0;
-//                readEnc(&EncCts4);
-//                CS4_1 = CS4_2  = CS4_3 = 1;
-//                CS5_1 = CS5_2  = CS5_3 = 0;
-//                readEnc(&EncCts5);
-//                CS5_1 = CS5_2  = CS5_3 = 1;
-//                CS6_1 = CS6_2  = CS6_3 = 0;
-//                readEnc(&EncCts6);
-//                CS6_1 = CS6_2  = CS6_3 = 1;
-//              
+
                 LED1 = 1;
+                
                 selectCS(RL_ODD);
                 readEnc(&EncCts1);
                 selectCS(ALL_CS_HIGH);
@@ -166,29 +146,69 @@ int main(void) {
                 selectCS(SA_EVEN);
                 readEnc(&EncCts3);
                 selectCS(ALL_CS_HIGH);
-                selectCS(SF_EVEN);
+                selectCS(SA_ODD);
                 readEnc(&EncCts4);
                 selectCS(ALL_CS_HIGH);
-                selectCS(SA_ODD);
+                selectCS(SF_EVEN);
                 readEnc(&EncCts5);
                 selectCS(ALL_CS_HIGH);
                 selectCS(SF_ODD);
                 readEnc(&EncCts6);
                 selectCS(ALL_CS_HIGH);
                 LED1 = 0;
+
+                uint32_t switchCS = 0;
+                switchCS =
+                        (S_SA1 * ~SA1) |
+                        (S_SF1 * ~SF1) |
+                        (S_SA2 * ~SA2) |
+                        (S_SF2 * ~SF2) |
+                        (S_SA3 * ~SA3) |
+                        (S_SF3 * ~SF3) |
+                        (S_SA4 * ~SA4) |
+                        (S_SF4 * ~SF4) |
+                        (S_SA5 * ~SA5) |
+                        (S_SF5 * ~SF5) |
+                        (S_SA6 * ~SA6) |
+                        (S_SF6 * ~SF6);
                 
+                selectCS(~switchCS);
+                setCNTRtoDTR();
+                selectCS(ALL_CS_HIGH);
+                
+                robot_encoders.RL1_ENCDR = EncCts1.cts1;
+                robot_encoders.RL3_ENCDR = EncCts1.cts3;
+                robot_encoders.RL5_ENCDR = EncCts1.cts2;
+                robot_encoders.RL2_ENCDR = EncCts2.cts3;
+                robot_encoders.RL4_ENCDR = EncCts2.cts1;
+                robot_encoders.RL6_ENCDR = EncCts2.cts2;
+                robot_encoders.SF1_ENCDR = EncCts3.cts3;
+                robot_encoders.SF3_ENCDR = EncCts3.cts1;
+                robot_encoders.SF5_ENCDR = EncCts3.cts2;
+                robot_encoders.SF2_ENCDR = EncCts4.cts3;
+                robot_encoders.SF4_ENCDR = EncCts4.cts1;
+                robot_encoders.SF6_ENCDR = EncCts4.cts2;
+                robot_encoders.SA1_ENCDR = EncCts5.cts3;
+                robot_encoders.SA3_ENCDR = EncCts5.cts1;
+                robot_encoders.SA5_ENCDR = EncCts5.cts2;
+                robot_encoders.SA2_ENCDR = EncCts6.cts3;
+                robot_encoders.SA4_ENCDR = EncCts6.cts1;
+                robot_encoders.SA6_ENCDR = EncCts6.cts2;
+                
+                        
                 
 
-                size = sprintf((char *) out, "1: %10ld %10ld %10ld %10ld %10ld %10ld  2: %10ld %10ld %10ld %10ld %10ld %10ld  3: %10ld %10ld %10ld %10ld %10ld %10ld \r\n", 
-                        EncCts1.cts1 , EncCts2.cts1 , EncCts3.cts1 , EncCts4.cts1 , EncCts5.cts1 , EncCts6.cts1 ,
-                        EncCts1.cts2 , EncCts2.cts2 , EncCts3.cts2 , EncCts4.cts2 , EncCts5.cts2 , EncCts6.cts2 ,
-                        EncCts1.cts3 , EncCts2.cts3 , EncCts3.cts3 , EncCts4.cts3 , EncCts5.cts3 , EncCts6.cts3);
-                
-//                size = sprintf((char *)out, "1: %5i %5i %5i %5i 2: %5i %5i %5i %5i 3: %5i %5i %5i %5i \r\n",
-//                        SW1_1 , SW2_1 , SW3_1 , SW4_1, 
-//                        SW1_2 , SW2_2 , SW3_2 , SW4_2,
-//                        SW1_3 , SW2_3 , SW3_3 , SW4_3);
-                
+
+                size = sprintf((char *) out, "1: %10ld %10ld %10ld %10ld %10ld %10ld  2: %10ld %10ld %10ld %10ld %10ld %10ld  3: %10ld %10ld %10ld %10ld %10ld %10ld %10ld \r\n",
+                        robot_encoders.RL1_ENCDR, robot_encoders.RL2_ENCDR, robot_encoders.RL3_ENCDR, robot_encoders.RL4_ENCDR, robot_encoders.RL5_ENCDR, robot_encoders.RL6_ENCDR,
+                        robot_encoders.SF1_ENCDR, robot_encoders.SF2_ENCDR, robot_encoders.SF3_ENCDR, robot_encoders.SF4_ENCDR, robot_encoders.SF5_ENCDR, robot_encoders.SF6_ENCDR,
+                        robot_encoders.SA1_ENCDR, robot_encoders.SA2_ENCDR, robot_encoders.SA3_ENCDR, robot_encoders.SA4_ENCDR, robot_encoders.SA5_ENCDR, robot_encoders.SA6_ENCDR);
+
+                //                size = sprintf((char *) out, "1: %5i %5i %5i %5i 2: %5i %5i %5i %5i 3: %5i %5i %5i %5i \r\n",
+                //                        SW1_1, SW2_1, SW3_1, SW4_1,
+                //                        SW1_2, SW2_2, SW3_2, SW4_2,
+                //                        S_SF6, SW2_3, SW3_3, SW4_3);
+
                 DMA0_UART2_Transfer(size, out);
 
                 //jj = (jj + (jj&0b10000)>>4)^0b10001;

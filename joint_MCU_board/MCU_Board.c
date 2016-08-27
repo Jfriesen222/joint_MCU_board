@@ -321,16 +321,16 @@ void __attribute__((__interrupt__, no_auto_psv)) _T7Interrupt(void) {
 void selectCS(uint32_t cs_bits){
     uint32_t i;
     i = 1;
-    CS1_1 = (i)&(cs_bits);
-    CS2_1 = ((i<<1)&(cs_bits))>>1;
-    CS3_1 = ((i<<2)&(cs_bits))>>2;
-    CS4_1 = ((i<<3)&(cs_bits))>>3;
-    CS5_1 = ((i<<4)&(cs_bits))>>4;
-    CS6_1 = ((i<<5)&(cs_bits))>>5; 
-    CS1_2 = ((i<<6)&(cs_bits))>>6;
-    CS2_2 = ((i<<7)&(cs_bits))>>7;
-    CS3_2 = ((i<<8)&(cs_bits))>>8;
-    CS4_2 = ((i<<9)&(cs_bits))>>9;
+    CS1_1 = ( i)    &(cs_bits);
+    CS2_1 = ((i<< 1)&(cs_bits))>> 1;
+    CS3_1 = ((i<< 2)&(cs_bits))>> 2;
+    CS4_1 = ((i<< 3)&(cs_bits))>> 3;
+    CS5_1 = ((i<< 4)&(cs_bits))>> 4;
+    CS6_1 = ((i<< 5)&(cs_bits))>> 5; 
+    CS1_2 = ((i<< 6)&(cs_bits))>> 6;
+    CS2_2 = ((i<< 7)&(cs_bits))>> 7;
+    CS3_2 = ((i<< 8)&(cs_bits))>> 8;
+    CS4_2 = ((i<< 9)&(cs_bits))>> 9;
     CS5_2 = ((i<<10)&(cs_bits))>>10;
     CS6_2 = ((i<<11)&(cs_bits))>>11;
     CS1_3 = ((i<<12)&(cs_bits))>>12;
@@ -340,3 +340,4 @@ void selectCS(uint32_t cs_bits){
     CS5_3 = ((i<<16)&(cs_bits))>>16;
     CS6_3 = ((i<<17)&(cs_bits))>>17;  
 }
+

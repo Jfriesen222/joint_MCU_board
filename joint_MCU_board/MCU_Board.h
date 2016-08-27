@@ -51,6 +51,7 @@
 #define SW3_1                   PORTAbits.RA3
 #define SW4_1                   PORTAbits.RA2
 
+
 #define TRIS_SW1_2              TRISBbits.TRISB11
 #define TRIS_SW2_2              TRISBbits.TRISB10
 #define TRIS_SW3_2              TRISBbits.TRISB9
@@ -77,6 +78,18 @@
 #define SW3_3                   PORTAbits.RA7
 #define SW4_3                   PORTAbits.RA6
 
+#define S_SA1                     PORTAbits.RA6
+#define S_SF1                     PORTAbits.RA7
+#define S_SA2                     PORTAbits.RA4
+#define S_SF2                     PORTAbits.RA5
+#define S_SA3                     PORTAbits.RA2
+#define S_SF3                     PORTAbits.RA3
+#define S_SA4                     PORTBbits.RB10
+#define S_SF4                     PORTBbits.RB11
+#define S_SA5                     PORTBbits.RB8
+#define S_SF5                     PORTBbits.RB9
+#define S_SA6                     PORTFbits.RF0
+#define S_SF6                     PORTFbits.RF1
 
 /* Chip Select */
 #define TRIS_CS1_1              TRISDbits.TRISD0
@@ -155,6 +168,11 @@
 #define SA1                     0b101111111111111111
 #define SF1                     0b011111111111111111
 
+
+
+
+
+
 #define SF_ODD                  SF1&SF3&SF5
 #define SF_EVEN                 SF2&SF4&SF6 
 #define SA_ODD                  SA1&SA3&SA5
@@ -176,7 +194,28 @@
 #define RESET_3                 LATDbits.LATD7
 
 
-
+typedef struct{
+    
+    long int RL1_ENCDR;
+    long int RL2_ENCDR;
+    long int RL3_ENCDR;
+    long int RL4_ENCDR;
+    long int RL5_ENCDR;
+    long int RL6_ENCDR;
+    long int SF1_ENCDR;
+    long int SF2_ENCDR;
+    long int SF3_ENCDR;
+    long int SF4_ENCDR;
+    long int SF5_ENCDR;
+    long int SF6_ENCDR;
+    long int SA1_ENCDR;
+    long int SA2_ENCDR;
+    long int SA3_ENCDR;
+    long int SA4_ENCDR;
+    long int SA5_ENCDR;
+    long int SA6_ENCDR;
+    
+} Robot_Encoders; 
 
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback);
 void selectCS(uint32_t cs_bits);
