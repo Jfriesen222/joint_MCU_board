@@ -28,8 +28,8 @@ unsigned int config1slow = ENABLE_SCK_PIN & // Internal Serial Clock is Enabled
         SLAVE_ENABLE_OFF & // Slave Select Disabled
         CLK_POL_ACTIVE_HIGH & // Idle state for clock is low, active is high
         MASTER_ENABLE_ON & // Master Mode
-        SEC_PRESCAL_6_1 &
-        PRI_PRESCAL_4_1 // SPI CLK at 5MHz
+        SEC_PRESCAL_4_1 &
+        PRI_PRESCAL_16_1 // SPI CLK at 5MHz
         ;
 
 
