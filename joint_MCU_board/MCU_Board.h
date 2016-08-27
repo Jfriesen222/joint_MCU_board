@@ -195,26 +195,24 @@
 
 
 typedef struct{
-    
     long int RL1_ENCDR;
     long int RL2_ENCDR;
     long int RL3_ENCDR;
     long int RL4_ENCDR;
     long int RL5_ENCDR;
     long int RL6_ENCDR;
-    long int SF1_ENCDR;
-    long int SF2_ENCDR;
-    long int SF3_ENCDR;
-    long int SF4_ENCDR;
-    long int SF5_ENCDR;
-    long int SF6_ENCDR;
-    long int SA1_ENCDR;
-    long int SA2_ENCDR;
-    long int SA3_ENCDR;
-    long int SA4_ENCDR;
-    long int SA5_ENCDR;
-    long int SA6_ENCDR;
-    
+    int SF1_ENCDR;
+    int SF2_ENCDR;
+    int SF3_ENCDR;
+    int SF4_ENCDR;
+    int SF5_ENCDR;
+    int SF6_ENCDR;
+    int SA1_ENCDR;
+    int SA2_ENCDR;
+    int SA3_ENCDR;
+    int SA4_ENCDR;
+    int SA5_ENCDR;
+    int SA6_ENCDR;
 } Robot_Encoders; 
 
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback);

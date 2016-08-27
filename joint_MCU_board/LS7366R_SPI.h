@@ -97,6 +97,12 @@ typedef struct {
     long int cts1;
     long int cts2;
     long int cts3;
+} EncoderCtsLong;
+
+typedef struct {
+    int cts1;
+    int cts2;
+    int cts3;
 } EncoderCts;
 
 typedef struct {
@@ -107,8 +113,11 @@ typedef struct {
 
 void config_spi_slow();
 void setQuadX4();
+void set2ByteMode();
+void writeDTRtoZerosLong();
 void writeDTRtoZeros();
 void setCNTRtoDTR();
+void readEncLong(EncoderCtsLong *EncVals);
 void readEnc(EncoderCts *EncVals);
 void read_SPI(int command, tripSPIdata *datas);
 void write_SPI(int command);

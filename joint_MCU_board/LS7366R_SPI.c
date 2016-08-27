@@ -28,8 +28,8 @@ unsigned int config1slow = ENABLE_SCK_PIN & // Internal Serial Clock is Enabled
         SLAVE_ENABLE_OFF & // Slave Select Disabled
         CLK_POL_ACTIVE_HIGH & // Idle state for clock is low, active is high
         MASTER_ENABLE_ON & // Master Mode
-        SEC_PRESCAL_2_1 &
-        PRI_PRESCAL_16_1 // SPI CLK at 5MHz
+        SEC_PRESCAL_6_1 &
+        PRI_PRESCAL_4_1 // SPI CLK at 5MHz
         ;
 
 
@@ -44,7 +44,6 @@ unsigned int config3 = SPI_ENABLE & // Enable module
         SPI_RX_OVFLOW_CLR // Clear receive overflow bit
         ;
 
-
 void config_spi_slow() {
     CloseSPI1();
     CloseSPI2();
@@ -53,7 +52,6 @@ void config_spi_slow() {
     OpenSPI2(config1slow, config2, config3);
     OpenSPI3(config1slow, config2, config3);
 }
-
 
 void setQuadX4() {
     // Initialize encoder 1
@@ -66,20 +64,41 @@ void setQuadX4() {
     write_SPI(QUADRX4); // Configure to 4 byte mode
 }
 
-void writeDTRtoZeros() {
-    write_SPI(WRITE_DTR);    
-    // Load data
-    write_SPI(0x00);  // Highest order byte
-    write_SPI(0x00);           
-    write_SPI(0x00);           
-    write_SPI(0x00);  // lowest order byte
+void set2ByteMode() {
+    // Initialize encoder 1
+    //    Clock division factor: 0
+    //    Negative index input
+    //    free-running count mode
+    //    x4 quatrature count mode (four counts per quadrature cycle)
+    // NOTE: For more information on commands, see datasheet
+    write_SPI(WRITE_MDR1); // Write to MDR0      
+    write_SPI(0x02); // Configure to 4 byte mode
 }
+
+
+
+void writeDTRtoZerosLong() {
+    write_SPI(WRITE_DTR);
+    // Load data
+    write_SPI(0x00); // Highest order byte
+    write_SPI(0x00);
+    write_SPI(0x00);
+    write_SPI(0x00); // lowest order byte
+}
+
+void writeDTRtoZeros() {
+    write_SPI(WRITE_DTR);
+    // Load data
+    write_SPI(0x00); // Highest order byte
+    write_SPI(0x00);
+}
+
 
 void setCNTRtoDTR() {
-    write_SPI(LOAD_CNTR); 
+    write_SPI(LOAD_CNTR);
 }
 
-void readEnc(EncoderCts *EncVals) {
+void readEncLong(EncoderCtsLong *EncVals) {
     // Initialize temporary variables for SPI read
     write_SPI(READ_CNTR); // Request count
     read_SPI(0x00, &cntData1); // Read highest order byte
@@ -103,6 +122,22 @@ void readEnc(EncoderCts *EncVals) {
     EncVals->cts3 = count_value;
 }
 
+void readEnc(EncoderCts *EncVals) {
+    // Initialize temporary variables for SPI read
+    write_SPI(READ_CNTR); // Request count
+    read_SPI(0x00, &cntData1); // Read highest order byte
+    read_SPI(0x00, &cntData2);
+
+    // Calculate encoder count
+    long int count_value;
+    count_value = (cntData1.data1 << 8) + cntData2.data1;
+    EncVals->cts1 = count_value;
+    count_value = (cntData1.data2 << 8) + cntData2.data2;
+    EncVals->cts2 = count_value;
+    count_value = (cntData1.data3 << 8) + cntData2.data3;
+    EncVals->cts3 = count_value;
+}
+
 void read_SPI(int command, tripSPIdata *datas) {
     int bufVal;
     bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
@@ -111,13 +146,13 @@ void read_SPI(int command, tripSPIdata *datas) {
     SPI1BUF = command; // write the data out to the SPI peripheral
     SPI2BUF = command; // write the data out to the SPI peripheral
     SPI3BUF = command; // write the data out to the SPI peripheral
-    while ((!SPI1STATbits.SPIRBF)|(!SPI2STATbits.SPIRBF)|(!SPI3STATbits.SPIRBF)) ; // wait for the data to be sent out
+    while ((!SPI1STATbits.SPIRBF) || (!SPI2STATbits.SPIRBF) || (!SPI3STATbits.SPIRBF)); // wait for the data to be sent out
     datas->data1 = SPI1BUF;
     datas->data2 = SPI3BUF;
     datas->data3 = SPI2BUF;
 }
 
-void write_SPI(int command){
+void write_SPI(int command) {
     int bufVal;
     bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
     bufVal = SPI2BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
@@ -125,5 +160,5 @@ void write_SPI(int command){
     SPI1BUF = command; // write the data out to the SPI peripheral
     SPI2BUF = command; // write the data out to the SPI peripheral
     SPI3BUF = command; // write the data out to the SPI peripheral
-   while ((!SPI1STATbits.SPIRBF)|(!SPI2STATbits.SPIRBF)|(!SPI3STATbits.SPIRBF)) ; // wait for the data to be sent out
+    while ((!SPI1STATbits.SPIRBF) || (!SPI2STATbits.SPIRBF) || (!SPI3STATbits.SPIRBF)); // wait for the data to be sent out
 }

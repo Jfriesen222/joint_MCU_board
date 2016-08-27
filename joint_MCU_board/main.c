@@ -20,6 +20,9 @@
 #include "LS7366R_SPI.h"
 #include <p33Exxxx.h>
 
+long int  SA_MAX_VEL =  2000;
+long int  SF_MAX_VEL =  1000;
+
 CircularBuffer uartBuffer;
 uint8_t uartBuf[64];
 CircularBuffer canBuffer;
@@ -27,12 +30,8 @@ uint8_t canBuf[64];
 CircularBuffer spiBuffer;
 uint16_t spiBuf[64];
 
-EncoderCts EncCts1;
-EncoderCts EncCts2;
-EncoderCts EncCts3;
-EncoderCts EncCts4;
-EncoderCts EncCts5;
-EncoderCts EncCts6;
+EncoderCts EncCts;
+EncoderCtsLong EncCtsLong;
 
 Robot_Encoders robot_encoders;
 
@@ -57,7 +56,7 @@ enum {
 };
 
 void EventChecker(void);
-void SetMotors(void);
+void manageEncoders(void);
 
 int main(void) {
     commandSet.cmd1 = 0;
@@ -65,9 +64,9 @@ int main(void) {
     commandSet.cmd3 = 0;
     commandSet.cmd4 = 0;
     commandSet.cmd5 = 0;
-    static uint8_t out[300];
+    static uint8_t out[500];
     static uint8_t size;
-    static uint8_t size2;
+    
     CB_Init(&uartBuffer, uartBuf, 32);
     CB_Init(&spiBuffer, (uint8_t *) spiBuf, 128);
     InitBoard(&ADCBuff, &uartBuffer, &spiBuffer, EventChecker);
@@ -78,8 +77,16 @@ int main(void) {
     selectCS(ALL_CS_LOW);
     setQuadX4();
     selectCS(ALL_CS_HIGH);
+    
+    selectCS(SF_ODD&SF_EVEN&SA_ODD&SA_EVEN);
+    set2ByteMode();
+    selectCS(ALL_CS_HIGH);
+    
+    selectCS(RL_ODD&RL_EVEN);
+    writeDTRtoZerosLong();
+    selectCS(ALL_CS_HIGH);
 
-    selectCS(ALL_CS_LOW);
+    selectCS(SF_ODD&SF_EVEN&SA_ODD&SA_EVEN);
     writeDTRtoZeros();
     selectCS(ALL_CS_HIGH);
 
@@ -93,31 +100,11 @@ int main(void) {
 
     putsUART2((unsigned int *) "Init. Complete\r\n");
     controller = 0;
-    SetMotors();
 
     InitDecoder(&commandSet);
     //Pass pointer to com protocol
-
-
     while (1) {
         if (events & EVENT_UPDATE_SPEED) {
-
-            /******************************************************************************
-             * Function:        void Delay(void))
-             *
-             * PreCondition:    None   
-             *
-             * Input:           None
-             *                  
-             * Output:          None
-             *
-             * Side Effects:    None
-             *
-             * Overview:        This function provides sofware Delay
-             *****************************************************************************/
-
-
-
             RESET_3 = 1;
             RESET_2 = 1;
             RESET_1 = 1;
@@ -126,80 +113,21 @@ int main(void) {
             float freq;
             freq = 200.0;
             amplitude = 100;
+            
             MOTOR1_3 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
             MOTOR2_3 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
             MOTOR1_1 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
             MOTOR2_1 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
             MOTOR1_2 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
             MOTOR2_2 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-
+            
+            LED1 = 1;
+            manageEncoders();
+            LED1 = 0;
+            
             if (iii % 100 == 0) {
-
-                LED1 = 1;
-                
-                selectCS(RL_ODD);
-                readEnc(&EncCts1);
-                selectCS(ALL_CS_HIGH);
-                selectCS(RL_EVEN);
-                readEnc(&EncCts2);
-                selectCS(ALL_CS_HIGH);
-                selectCS(SA_EVEN);
-                readEnc(&EncCts3);
-                selectCS(ALL_CS_HIGH);
-                selectCS(SA_ODD);
-                readEnc(&EncCts4);
-                selectCS(ALL_CS_HIGH);
-                selectCS(SF_EVEN);
-                readEnc(&EncCts5);
-                selectCS(ALL_CS_HIGH);
-                selectCS(SF_ODD);
-                readEnc(&EncCts6);
-                selectCS(ALL_CS_HIGH);
-                LED1 = 0;
-
-                uint32_t switchCS = 0;
-                switchCS =
-                        (S_SA1 * ~SA1) |
-                        (S_SF1 * ~SF1) |
-                        (S_SA2 * ~SA2) |
-                        (S_SF2 * ~SF2) |
-                        (S_SA3 * ~SA3) |
-                        (S_SF3 * ~SF3) |
-                        (S_SA4 * ~SA4) |
-                        (S_SF4 * ~SF4) |
-                        (S_SA5 * ~SA5) |
-                        (S_SF5 * ~SF5) |
-                        (S_SA6 * ~SA6) |
-                        (S_SF6 * ~SF6);
-                
-                selectCS(~switchCS);
-                setCNTRtoDTR();
-                selectCS(ALL_CS_HIGH);
-                
-                robot_encoders.RL1_ENCDR = EncCts1.cts1;
-                robot_encoders.RL3_ENCDR = EncCts1.cts3;
-                robot_encoders.RL5_ENCDR = EncCts1.cts2;
-                robot_encoders.RL2_ENCDR = EncCts2.cts3;
-                robot_encoders.RL4_ENCDR = EncCts2.cts1;
-                robot_encoders.RL6_ENCDR = EncCts2.cts2;
-                robot_encoders.SF1_ENCDR = EncCts3.cts3;
-                robot_encoders.SF3_ENCDR = EncCts3.cts1;
-                robot_encoders.SF5_ENCDR = EncCts3.cts2;
-                robot_encoders.SF2_ENCDR = EncCts4.cts3;
-                robot_encoders.SF4_ENCDR = EncCts4.cts1;
-                robot_encoders.SF6_ENCDR = EncCts4.cts2;
-                robot_encoders.SA1_ENCDR = EncCts5.cts3;
-                robot_encoders.SA3_ENCDR = EncCts5.cts1;
-                robot_encoders.SA5_ENCDR = EncCts5.cts2;
-                robot_encoders.SA2_ENCDR = EncCts6.cts3;
-                robot_encoders.SA4_ENCDR = EncCts6.cts1;
-                robot_encoders.SA6_ENCDR = EncCts6.cts2;
-                
-                        
-                
-
-
-                size = sprintf((char *) out, "1: %10ld %10ld %10ld %10ld %10ld %10ld  2: %10ld %10ld %10ld %10ld %10ld %10ld  3: %10ld %10ld %10ld %10ld %10ld %10ld %10ld \r\n",
+          
+                size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
                         robot_encoders.RL1_ENCDR, robot_encoders.RL2_ENCDR, robot_encoders.RL3_ENCDR, robot_encoders.RL4_ENCDR, robot_encoders.RL5_ENCDR, robot_encoders.RL6_ENCDR,
                         robot_encoders.SF1_ENCDR, robot_encoders.SF2_ENCDR, robot_encoders.SF3_ENCDR, robot_encoders.SF4_ENCDR, robot_encoders.SF5_ENCDR, robot_encoders.SF6_ENCDR,
                         robot_encoders.SA1_ENCDR, robot_encoders.SA2_ENCDR, robot_encoders.SA3_ENCDR, robot_encoders.SA4_ENCDR, robot_encoders.SA5_ENCDR, robot_encoders.SA6_ENCDR);
@@ -210,9 +138,6 @@ int main(void) {
                 //                        S_SF6, SW2_3, SW3_3, SW4_3);
 
                 DMA0_UART2_Transfer(size, out);
-
-                //jj = (jj + (jj&0b10000)>>4)^0b10001;
-
                 //LED1 = (jj & 0b1);
                 LED1 = SW4_2;
                 LED2 = (jj & 0b10) >> 1;
@@ -221,12 +146,6 @@ int main(void) {
                 jj = ((jj << 1));
                 jj = jj == 0b10000 ? 1 : jj;
             }
-            if (iii % 5 == 1) {
-
-                //IMU_GetData(&mpuData, &magData);
-
-            }
-            //SetMotors();
             events &= ~EVENT_UPDATE_SPEED;
         }
 
@@ -291,13 +210,64 @@ void EventChecker(void) {
     events |= EVENT_UPDATE_SPEED;
 }
 
-void SetMotors() {
+void manageEncoders() {
+                uint32_t switchCS = 0;
+                
+                switchCS = (S_SA1 * ~SA1) | (S_SF1 * ~SF1) | (S_SA2 * ~SA2) |
+                           (S_SF2 * ~SF2) | (S_SA3 * ~SA3) | (S_SF3 * ~SF3) |
+                           (S_SA4 * ~SA4) | (S_SF4 * ~SF4) | (S_SA5 * ~SA5) |
+                           (S_SF5 * ~SF5) | (S_SA6 * ~SA6) | (S_SF6 * ~SF6);
 
+                selectCS(~switchCS);
+                setCNTRtoDTR();
+                selectCS(ALL_CS_HIGH);
+
+                selectCS(RL_ODD);
+                readEncLong(&EncCtsLong);
+                selectCS(ALL_CS_HIGH);
+                robot_encoders.RL1_ENCDR = EncCtsLong.cts1;
+                robot_encoders.RL3_ENCDR = EncCtsLong.cts2;
+                robot_encoders.RL5_ENCDR = EncCtsLong.cts3;
+                
+                selectCS(RL_EVEN);
+                readEncLong(&EncCtsLong);
+                selectCS(ALL_CS_HIGH);
+                robot_encoders.RL2_ENCDR = EncCtsLong.cts3;
+                robot_encoders.RL4_ENCDR = EncCtsLong.cts1;
+                robot_encoders.RL6_ENCDR = EncCtsLong.cts2;
+                
+                selectCS(SF_ODD);
+                readEnc(&EncCts);
+                selectCS(ALL_CS_HIGH);
+                robot_encoders.SF1_ENCDR = -EncCts.cts3;
+                robot_encoders.SF3_ENCDR = -EncCts.cts1;
+                robot_encoders.SF5_ENCDR = -EncCts.cts2;
+                
+                selectCS(SF_EVEN);
+                readEnc(&EncCts);
+                selectCS(ALL_CS_HIGH);
+                robot_encoders.SF2_ENCDR = EncCts.cts1;
+                robot_encoders.SF4_ENCDR = EncCts.cts2;
+                robot_encoders.SF6_ENCDR = EncCts.cts3;
+                
+                selectCS(SA_ODD);
+                readEnc(&EncCts);
+                selectCS(ALL_CS_HIGH);
+                
+                robot_encoders.SA1_ENCDR =  EncCts.cts3;
+                robot_encoders.SA3_ENCDR =  EncCts.cts1;
+                robot_encoders.SA5_ENCDR =  EncCts.cts2;
+                
+                selectCS(SA_EVEN);
+                readEnc(&EncCts);
+                selectCS(ALL_CS_HIGH);
+                
+                robot_encoders.SA2_ENCDR = -EncCts.cts1;
+                robot_encoders.SA4_ENCDR = -EncCts.cts2;
+                robot_encoders.SA6_ENCDR = -EncCts.cts3;              
 }
 
 void __attribute__((__interrupt__, no_auto_psv)) _CNInterrupt(void) {
-
-    SetMotors();
     IFS1bits.CNIF = 0; // Clear CN interrupt
 }
 
