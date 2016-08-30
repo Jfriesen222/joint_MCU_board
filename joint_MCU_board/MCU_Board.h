@@ -149,39 +149,44 @@
 #define ODC_CS5_3               ODCGbits.ODCG0
 #define ODC_CS6_3               ODCGbits.ODCG1
 
-#define RL1                     0b111111111111111110
-#define RL4                     0b111111111111111101
-#define SA2                     0b111111111111111011
-#define SF2                     0b111111111111110111
-#define SA3                     0b111111111111101111
-#define SF3                     0b111111111111011111
-#define RL3                     0b111111111110111111
-#define RL6                     0b111111111101111111
-#define SA4                     0b111111111011111111
-#define SF4                     0b111111110111111111
-#define SA5                     0b111111101111111111
-#define SF5                     0b111111011111111111
-#define RL5                     0b111110111111111111
-#define RL2                     0b111101111111111111
-#define SA6                     0b111011111111111111
-#define SF6                     0b110111111111111111
-#define SA1                     0b101111111111111111
-#define SF1                     0b011111111111111111
+#define RL1_1                     0b1111111111111110
+#define RL4_1                     0b1111111111111101
+#define SA2_1                     0b1111111111111011
+#define SF2_1                     0b1111111111110111
+#define SA3_1                     0b1111111111101111
+#define SF3_1                     0b1111111111011111
+#define RL3_1                     0b1111111110111111
+#define RL6_1                     0b1111111101111111
+#define SA4_1                     0b1111111011111111
+#define SF4_1                     0b1111110111111111
+#define SA5_1                     0b1111101111111111
+#define SF5_1                     0b1111011111111111
+#define RL5_1                     0b1110111111111111
+#define RL2_1                     0b1101111111111111
+#define SA6_1                     0b1011111111111111
+#define SF6_1                     0b0111111111111111
+#define SA1_2                     0b1111111111111110
+#define SF1_2                     0b1111111111111101
 
 
 
-
-
-
-#define SF_ODD                  SF1&SF3&SF5
-#define SF_EVEN                 SF2&SF4&SF6 
-#define SA_ODD                  SA1&SA3&SA5
-#define SA_EVEN                 SA2&SA4&SA6
-#define RL_ODD                  RL1&RL3&RL5
-#define RL_EVEN                 RL2&RL4&RL6
 
 #define ALL_CS_LOW              0x0
-#define ALL_CS_HIGH             0x3FFFF
+#define ALL_CS_HIGH             0xFFFF
+
+#define SF_ODD_1                SF3_1&SF5_1
+#define SF_ODD_2                SF1_2
+#define SF_EVEN_1               SF2_1&SF4_1&SF6_1 
+#define SF_EVEN_2               ALL_CS_HIGH
+#define SA_ODD_1                SA3_1&SA5_1
+#define SA_ODD_2                SA1_2
+#define SA_EVEN_1               SA2_1&SA4_1&SA6_1
+#define SA_EVEN_2               ALL_CS_HIGH
+#define RL_ODD_1                RL1_1&RL3_1&RL5_1
+#define RL_ODD_2                ALL_CS_HIGH
+#define RL_EVEN_1               RL2_1&RL4_1&RL6_1
+#define RL_EVEN_2               ALL_CS_HIGH
+
 
 /* Reset Pins */
 #define TRIS_RESET_1            TRISAbits.TRISA14
@@ -216,4 +221,4 @@ typedef struct{
 } Robot_Encoders; 
 
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback);
-void selectCS(uint32_t cs_bits);
+void selectCS(uint16_t cs_bits1, uint16_t cs_bits2 );

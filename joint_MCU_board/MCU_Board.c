@@ -318,26 +318,24 @@ void __attribute__((__interrupt__, no_auto_psv)) _T7Interrupt(void) {
     IFS3bits.T7IF = 0; // Clear Timer1 Interrupt Flag
 }
 
-void selectCS(uint32_t cs_bits){
-    uint32_t i;
-    i = 1;
-    CS1_1 = ( i)    &(cs_bits);
-    CS2_1 = ((i<< 1)&(cs_bits))>> 1;
-    CS3_1 = ((i<< 2)&(cs_bits))>> 2;
-    CS4_1 = ((i<< 3)&(cs_bits))>> 3;
-    CS5_1 = ((i<< 4)&(cs_bits))>> 4;
-    CS6_1 = ((i<< 5)&(cs_bits))>> 5; 
-    CS1_2 = ((i<< 6)&(cs_bits))>> 6;
-    CS2_2 = ((i<< 7)&(cs_bits))>> 7;
-    CS3_2 = ((i<< 8)&(cs_bits))>> 8;
-    CS4_2 = ((i<< 9)&(cs_bits))>> 9;
-    CS5_2 = ((i<<10)&(cs_bits))>>10;
-    CS6_2 = ((i<<11)&(cs_bits))>>11;
-    CS1_3 = ((i<<12)&(cs_bits))>>12;
-    CS2_3 = ((i<<13)&(cs_bits))>>13;
-    CS3_3 = ((i<<14)&(cs_bits))>>14;
-    CS4_3 = ((i<<15)&(cs_bits))>>15;
-    CS5_3 = ((i<<16)&(cs_bits))>>16;
-    CS6_3 = ((i<<17)&(cs_bits))>>17;  
+void selectCS(uint16_t cs_bits1, uint16_t cs_bits2 ){
+    CS1_1 =  (0b0000000000000001)&(cs_bits1);
+    CS2_1 = ((0b0000000000000010)&(cs_bits1))>> 1;
+    CS3_1 = ((0b0000000000000100)&(cs_bits1))>> 2;
+    CS4_1 = ((0b0000000000001000)&(cs_bits1))>> 3;
+    CS5_1 = ((0b0000000000010000)&(cs_bits1))>> 4;
+    CS6_1 = ((0b0000000000100000)&(cs_bits1))>> 5; 
+    CS1_2 = ((0b0000000001000000)&(cs_bits1))>> 6;
+    CS2_2 = ((0b0000000010000000)&(cs_bits1))>> 7;
+    CS3_2 = ((0b0000000100000000)&(cs_bits1))>> 8;
+    CS4_2 = ((0b0000001000000000)&(cs_bits1))>> 9;
+    CS5_2 = ((0b0000010000000000)&(cs_bits1))>>10;
+    CS6_2 = ((0b0000100000000000)&(cs_bits1))>>11;
+    CS1_3 = ((0b0001000000000000)&(cs_bits1))>>12;
+    CS2_3 = ((0b0010000000000000)&(cs_bits1))>>13;
+    CS3_3 = ((0b0100000000000000)&(cs_bits1))>>14;
+    CS4_3 = ((0b1000000000000000)&(cs_bits1))>>15;
+    CS5_3 = ((0b0000000000000001)&(cs_bits2));
+    CS6_3 = ((0b0000000000000010)&(cs_bits2))>>1;  
 }
 

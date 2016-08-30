@@ -28,7 +28,7 @@ unsigned int config1slow = ENABLE_SCK_PIN & // Internal Serial Clock is Enabled
         SLAVE_ENABLE_OFF & // Slave Select Disabled
         CLK_POL_ACTIVE_HIGH & // Idle state for clock is low, active is high
         MASTER_ENABLE_ON & // Master Mode
-        SEC_PRESCAL_4_1 &
+        SEC_PRESCAL_3_1 &
         PRI_PRESCAL_16_1 // SPI CLK at 5MHz
         ;
 
@@ -129,7 +129,7 @@ void readEnc(EncoderCts *EncVals) {
     read_SPI(0x00, &cntData2);
 
     // Calculate encoder count
-    long int count_value;
+    int count_value;
     count_value = (cntData1.data1 << 8) + cntData2.data1;
     EncVals->cts1 = count_value;
     count_value = (cntData1.data2 << 8) + cntData2.data2;

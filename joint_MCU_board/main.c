@@ -74,25 +74,25 @@ int main(void) {
     config_spi_slow();
 
 
-    selectCS(ALL_CS_LOW);
+    selectCS(ALL_CS_LOW,ALL_CS_LOW);
     setQuadX4();
-    selectCS(ALL_CS_HIGH);
+    selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
     
-    selectCS(SF_ODD&SF_EVEN&SA_ODD&SA_EVEN);
+    selectCS(SF_ODD_1&SF_EVEN_1&SA_ODD_1&SA_EVEN_1,SF_ODD_2&SF_EVEN_2&SA_ODD_2&SA_EVEN_2 );
     set2ByteMode();
-    selectCS(ALL_CS_HIGH);
+    selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
     
-    selectCS(RL_ODD&RL_EVEN);
+    selectCS(RL_ODD_1&RL_EVEN_1,RL_ODD_2&RL_EVEN_2);
     writeDTRtoZerosLong();
-    selectCS(ALL_CS_HIGH);
+    selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
 
-    selectCS(SF_ODD&SF_EVEN&SA_ODD&SA_EVEN);
+    selectCS(SF_ODD_1&SF_EVEN_1&SA_ODD_1&SA_EVEN_1,SF_ODD_2&SF_EVEN_2&SA_ODD_2&SA_EVEN_2);
     writeDTRtoZeros();
-    selectCS(ALL_CS_HIGH);
+    selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
 
-    selectCS(ALL_CS_LOW);
+    selectCS(ALL_CS_LOW,ALL_CS_LOW);
     setCNTRtoDTR();
-    selectCS(ALL_CS_HIGH);
+    selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
 
 
 
@@ -211,56 +211,58 @@ void EventChecker(void) {
 }
 
 void manageEncoders() {
-                uint32_t switchCS = 0;
+                uint32_t switchCS_1 = 0,switchCS_2 = 0 ;
                 
-                switchCS = (S_SA1 * ~SA1) | (S_SF1 * ~SF1) | (S_SA2 * ~SA2) |
-                           (S_SF2 * ~SF2) | (S_SA3 * ~SA3) | (S_SF3 * ~SF3) |
-                           (S_SA4 * ~SA4) | (S_SF4 * ~SF4) | (S_SA5 * ~SA5) |
-                           (S_SF5 * ~SF5) | (S_SA6 * ~SA6) | (S_SF6 * ~SF6);
+                switchCS_2 = (S_SA1 * ~SA1_2) | (S_SF1 * ~SF1_2); 
+                switchCS_1 = (S_SA2 * ~SA2_1) | (S_SF2 * ~SF2_1) 
+                           | (S_SA3 * ~SA3_1) | (S_SF3 * ~SF3_1) 
+                           | (S_SA4 * ~SA4_1) | (S_SF4 * ~SF4_1) 
+                           | (S_SA5 * ~SA5_1) | (S_SF5 * ~SF5_1) 
+                           | (S_SA6 * ~SA6_1) | (S_SF6 * ~SF6_1);
 
-                selectCS(~switchCS);
+                selectCS(~switchCS_1,~switchCS_2);
                 setCNTRtoDTR();
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
 
-                selectCS(RL_ODD);
+                selectCS(RL_ODD_1,RL_ODD_2);
                 readEncLong(&EncCtsLong);
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
                 robot_encoders.RL1_ENCDR = EncCtsLong.cts1;
                 robot_encoders.RL3_ENCDR = EncCtsLong.cts2;
                 robot_encoders.RL5_ENCDR = EncCtsLong.cts3;
                 
-                selectCS(RL_EVEN);
+                selectCS(RL_EVEN_1, RL_EVEN_2);
                 readEncLong(&EncCtsLong);
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
                 robot_encoders.RL2_ENCDR = EncCtsLong.cts3;
                 robot_encoders.RL4_ENCDR = EncCtsLong.cts1;
                 robot_encoders.RL6_ENCDR = EncCtsLong.cts2;
                 
-                selectCS(SF_ODD);
+                selectCS(SF_ODD_1, SF_ODD_2);
                 readEnc(&EncCts);
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
                 robot_encoders.SF1_ENCDR = -EncCts.cts3;
                 robot_encoders.SF3_ENCDR = -EncCts.cts1;
                 robot_encoders.SF5_ENCDR = -EncCts.cts2;
                 
-                selectCS(SF_EVEN);
+                selectCS(SF_EVEN_1, SF_EVEN_2);
                 readEnc(&EncCts);
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
                 robot_encoders.SF2_ENCDR = EncCts.cts1;
                 robot_encoders.SF4_ENCDR = EncCts.cts2;
                 robot_encoders.SF6_ENCDR = EncCts.cts3;
                 
-                selectCS(SA_ODD);
+                selectCS(SA_ODD_1,SA_ODD_2);
                 readEnc(&EncCts);
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
                 
                 robot_encoders.SA1_ENCDR =  EncCts.cts3;
                 robot_encoders.SA3_ENCDR =  EncCts.cts1;
                 robot_encoders.SA5_ENCDR =  EncCts.cts2;
                 
-                selectCS(SA_EVEN);
+                selectCS(SA_EVEN_1,SA_EVEN_2);
                 readEnc(&EncCts);
-                selectCS(ALL_CS_HIGH);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
                 
                 robot_encoders.SA2_ENCDR = -EncCts.cts1;
                 robot_encoders.SA4_ENCDR = -EncCts.cts2;
