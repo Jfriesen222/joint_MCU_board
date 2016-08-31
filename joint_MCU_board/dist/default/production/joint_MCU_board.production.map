@@ -208,12 +208,12 @@ section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200              0x1c06          0x2a09  (10761)
 .const                      0x1e06                0x8c            0xd2  (210)
-.text                       0x1e92              0x1a50          0x2778  (10104)
-.dinit                      0x38e2               0x20a           0x30f  (783)
-.text                       0x3aec               0x39e           0x56d  (1389)
-.shared.dinit               0x3e8a                 0x2             0x3  (3)
+.text                       0x1e92              0x1b5c          0x290a  (10506)
+.dinit                      0x39ee               0x20a           0x30f  (783)
+.text                       0x3bf8               0x39e           0x56d  (1389)
+.shared.dinit               0x3f96                 0x2             0x3  (3)
 
-                 Total program memory used (bytes):         0x5ad2  (23250) 8%
+                 Total program memory used (bytes):         0x5c64  (23652) 9%
 
 
 Ivt Memory  [Origin = 0x4, Length = 0x1fc]
@@ -254,7 +254,7 @@ section                    address      alignment gaps    total length  (dec)
 .data                       0x1722                   0            0x26  (38)
 .bss                        0x1748                   0            0x20  (32)
 .data                       0x1768                   0             0x2  (2)
-_05E8B60057c63ffe           0x7f40                   0            0xc0  (192)
+_05E5B60057c651b0           0x7f40                   0            0xc0  (192)
 
                  Total data memory used (bytes):          0x82a  (2090) 7%
 
@@ -461,92 +461,92 @@ External Symbols in Program Memory (by address):
                   0x00259a                  __T7Interrupt
                   0x0025ba                  _selectCS
                   0x00278a                  _main
-                  0x0029ca                  _EventChecker
-                  0x002a0c                  _manageEncoders
-                  0x002d94                  _manageMotors
-                  0x002dbe                  __CNInterrupt
-                  0x002dc6                  _CB_Init
-                  0x002e2c                  _CB_ReadByte
-                  0x002ea6                  _CB_ReadMany
-                  0x002f22                  _CB_WriteByte
-                  0x002f86                  _CB_WriteMany
-                  0x003086                  _CB_Peek
-                  0x0030b4                  _CB_PeekMany
-                  0x003118                  _CB_Remove
-                  0x00317c                  _InitDecoder
-                  0x00319e                  _DecodeStream
-                  0x0033ba                  _BuildSentence
-                  0x00344a                  _Hex2Dec
-                  0x0034a0                  _DMA0_UART2_Transfer
-                  0x0034dc                  _DMA1_UART2_Enable_RX
-                  0x003526                  _DMA2_SPI_Transfer
-                  0x003566                  _DMA3_SPI_Enable_RX
-                  0x0035a0                  _DMA4_CAN_Transfer
-                  0x0035d2                  _DMA5_CAN_Enable_RX
-                  0x0035de                  _DMA6_ADC_Enable
-                  0x003612                  __DMA0Interrupt
-                  0x00361a                  __DMA1Interrupt
-                  0x00366a                  __DMA2Interrupt
-                  0x003672                  __DMA3Interrupt
-                  0x003696                  __DMA4Interrupt
-                  0x00369e                  __DMA5Interrupt
-                  0x0036c2                  __DMA6Interrupt
-                  0x0036d4                  _config_spi_slow
-                  0x0036f8                  _setQuadX4
-                  0x003706                  _set2ByteMode
-                  0x003714                  _writeDTRtoZerosLong
-                  0x00372e                  _writeDTRtoZeros
-                  0x003740                  _setCNTRtoDTR
-                  0x00374a                  _readEncLong
-                  0x003814                  _readEnc
-                  0x003854                  _read_SPI
-                  0x0038a8                  _write_SPI
-                  0x003aec                  _buildAndCheckSentence
-                  0x003bb6                  _myTokenizer
-                  0x003c36                  _getChecksum
-                  0x003c92                  _I2C_Init
-                  0x003ca4                  _I2C_WriteToReg
-                  0x003d1c                  _I2C_ReadFromReg
-                  0x003d32                  _I2C_ReadFromReg_Burst
-                  0x003dfc                  _hexchar2int
-                  0x003e3a                  _int2hexchar
-                  0x003e62                  _degMinToDeg
+                  0x002a70                  _EventChecker
+                  0x002ab2                  _manageEncoders
+                  0x002e3a                  _manageMotors
+                  0x002eca                  __CNInterrupt
+                  0x002ed2                  _CB_Init
+                  0x002f38                  _CB_ReadByte
+                  0x002fb2                  _CB_ReadMany
+                  0x00302e                  _CB_WriteByte
+                  0x003092                  _CB_WriteMany
+                  0x003192                  _CB_Peek
+                  0x0031c0                  _CB_PeekMany
+                  0x003224                  _CB_Remove
+                  0x003288                  _InitDecoder
+                  0x0032aa                  _DecodeStream
+                  0x0034c6                  _BuildSentence
+                  0x003556                  _Hex2Dec
+                  0x0035ac                  _DMA0_UART2_Transfer
+                  0x0035e8                  _DMA1_UART2_Enable_RX
+                  0x003632                  _DMA2_SPI_Transfer
+                  0x003672                  _DMA3_SPI_Enable_RX
+                  0x0036ac                  _DMA4_CAN_Transfer
+                  0x0036de                  _DMA5_CAN_Enable_RX
+                  0x0036ea                  _DMA6_ADC_Enable
+                  0x00371e                  __DMA0Interrupt
+                  0x003726                  __DMA1Interrupt
+                  0x003776                  __DMA2Interrupt
+                  0x00377e                  __DMA3Interrupt
+                  0x0037a2                  __DMA4Interrupt
+                  0x0037aa                  __DMA5Interrupt
+                  0x0037ce                  __DMA6Interrupt
+                  0x0037e0                  _config_spi_slow
+                  0x003804                  _setQuadX4
+                  0x003812                  _set2ByteMode
+                  0x003820                  _writeDTRtoZerosLong
+                  0x00383a                  _writeDTRtoZeros
+                  0x00384c                  _setCNTRtoDTR
+                  0x003856                  _readEncLong
+                  0x003920                  _readEnc
+                  0x003960                  _read_SPI
+                  0x0039b4                  _write_SPI
+                  0x003bf8                  _buildAndCheckSentence
+                  0x003cc2                  _myTokenizer
+                  0x003d42                  _getChecksum
+                  0x003d9e                  _I2C_Init
+                  0x003db0                  _I2C_WriteToReg
+                  0x003e28                  _I2C_ReadFromReg
+                  0x003e3e                  _I2C_ReadFromReg_Burst
+                  0x003f08                  _hexchar2int
+                  0x003f46                  _int2hexchar
+                  0x003f6e                  _degMinToDeg
 
 External Symbols in Program Memory (by name):
 
                   0x002514                  _ADCInit
                   0x000344                  _AckI2C1
-                  0x0033ba                  _BuildSentence
-                  0x002dc6                  _CB_Init
-                  0x003086                  _CB_Peek
-                  0x0030b4                  _CB_PeekMany
-                  0x002e2c                  _CB_ReadByte
-                  0x002ea6                  _CB_ReadMany
-                  0x003118                  _CB_Remove
-                  0x002f22                  _CB_WriteByte
-                  0x002f86                  _CB_WriteMany
+                  0x0034c6                  _BuildSentence
+                  0x002ed2                  _CB_Init
+                  0x003192                  _CB_Peek
+                  0x0031c0                  _CB_PeekMany
+                  0x002f38                  _CB_ReadByte
+                  0x002fb2                  _CB_ReadMany
+                  0x003224                  _CB_Remove
+                  0x00302e                  _CB_WriteByte
+                  0x003092                  _CB_WriteMany
                   0x001f6e                  _ClockInit
                   0x00039e                  _CloseSPI1
                   0x0003a6                  _CloseSPI2
                   0x0003ae                  _CloseSPI3
-                  0x0034a0                  _DMA0_UART2_Transfer
-                  0x0034dc                  _DMA1_UART2_Enable_RX
-                  0x003526                  _DMA2_SPI_Transfer
-                  0x003566                  _DMA3_SPI_Enable_RX
-                  0x0035a0                  _DMA4_CAN_Transfer
-                  0x0035d2                  _DMA5_CAN_Enable_RX
-                  0x0035de                  _DMA6_ADC_Enable
-                  0x00319e                  _DecodeStream
+                  0x0035ac                  _DMA0_UART2_Transfer
+                  0x0035e8                  _DMA1_UART2_Enable_RX
+                  0x003632                  _DMA2_SPI_Transfer
+                  0x003672                  _DMA3_SPI_Enable_RX
+                  0x0036ac                  _DMA4_CAN_Transfer
+                  0x0036de                  _DMA5_CAN_Enable_RX
+                  0x0036ea                  _DMA6_ADC_Enable
+                  0x0032aa                  _DecodeStream
                   0x00258e                  _EventCheckInit
-                  0x0029ca                  _EventChecker
-                  0x00344a                  _Hex2Dec
-                  0x003c92                  _I2C_Init
-                  0x003d1c                  _I2C_ReadFromReg
-                  0x003d32                  _I2C_ReadFromReg_Burst
-                  0x003ca4                  _I2C_WriteToReg
+                  0x002a70                  _EventChecker
+                  0x003556                  _Hex2Dec
+                  0x003d9e                  _I2C_Init
+                  0x003e28                  _I2C_ReadFromReg
+                  0x003e3e                  _I2C_ReadFromReg_Burst
+                  0x003db0                  _I2C_WriteToReg
                   0x00034a                  _IdleI2C1
                   0x001e92                  _InitBoard
-                  0x00317c                  _InitDecoder
+                  0x003288                  _InitDecoder
                   0x000364                  _MasterReadI2C1
                   0x000370                  _MasterWriteI2C1
                   0x001ec4                  _MotorInit
@@ -560,14 +560,14 @@ External Symbols in Program Memory (by name):
                   0x00039a                  _StopI2C1
                   0x0024c0                  _TimersInit
                   0x001f46                  _UART2Init
-                  0x002dbe                  __CNInterrupt
-                  0x003612                  __DMA0Interrupt
-                  0x00361a                  __DMA1Interrupt
-                  0x00366a                  __DMA2Interrupt
-                  0x003672                  __DMA3Interrupt
-                  0x003696                  __DMA4Interrupt
-                  0x00369e                  __DMA5Interrupt
-                  0x0036c2                  __DMA6Interrupt
+                  0x002eca                  __CNInterrupt
+                  0x00371e                  __DMA0Interrupt
+                  0x003726                  __DMA1Interrupt
+                  0x003776                  __DMA2Interrupt
+                  0x00377e                  __DMA3Interrupt
+                  0x0037a2                  __DMA4Interrupt
+                  0x0037aa                  __DMA5Interrupt
+                  0x0037ce                  __DMA6Interrupt
                   0x0002e4                  __DefaultInterrupt
                   0x00259a                  __T7Interrupt
                   0x00160c                  ___adddf3
@@ -627,37 +627,37 @@ External Symbols in Program Memory (by name):
                   0x00094a                  __vfprintf_cdfFnopuxX
                   0x00094a                  __vfprintf_cdnopuxX
                   0x0006c6                  _atoi
-                  0x003aec                  _buildAndCheckSentence
-                  0x0036d4                  _config_spi_slow
-                  0x003e62                  _degMinToDeg
+                  0x003bf8                  _buildAndCheckSentence
+                  0x0037e0                  _config_spi_slow
+                  0x003f6e                  _degMinToDeg
                   0x001958                  _frexp
                   0x001958                  _frexpl
-                  0x003c36                  _getChecksum
-                  0x003dfc                  _hexchar2int
-                  0x003e3a                  _int2hexchar
+                  0x003d42                  _getChecksum
+                  0x003f08                  _hexchar2int
+                  0x003f46                  _int2hexchar
                   0x00278a                  _main
-                  0x002a0c                  _manageEncoders
-                  0x002d94                  _manageMotors
+                  0x002ab2                  _manageEncoders
+                  0x002e3a                  _manageMotors
                   0x000704                  _memcpy
                   0x000712                  _memset
-                  0x003bb6                  _myTokenizer
+                  0x003cc2                  _myTokenizer
                   0x0003ce                  _putsUART2
-                  0x003814                  _readEnc
-                  0x00374a                  _readEncLong
-                  0x003854                  _read_SPI
+                  0x003920                  _readEnc
+                  0x003856                  _readEncLong
+                  0x003960                  _read_SPI
                   0x0025ba                  _selectCS
-                  0x003706                  _set2ByteMode
-                  0x003740                  _setCNTRtoDTR
-                  0x0036f8                  _setQuadX4
+                  0x003812                  _set2ByteMode
+                  0x00384c                  _setCNTRtoDTR
+                  0x003804                  _setQuadX4
                   0x000720                  _strcat
                   0x000734                  _strchr
                   0x00153e                  _strcspn
                   0x000748                  _strlen
                   0x001564                  _strspn
                   0x000754                  _strtok
-                  0x00372e                  _writeDTRtoZeros
-                  0x003714                  _writeDTRtoZerosLong
-                  0x0038a8                  _write_SPI
+                  0x00383a                  _writeDTRtoZeros
+                  0x003820                  _writeDTRtoZerosLong
+                  0x0039b4                  _write_SPI
 
 Memory Configuration
 
@@ -951,42 +951,42 @@ __FUID0
 .comment
  *(.comment)
 
-.debug_info       0x000000       0xa3fb
+.debug_info       0x000000       0xa47e
  *(.debug_info)
- .debug_info      0x000000        0xff8 build/default/production/main.o
- .debug_info      0x000ff8       0x21c2 build/default/production/DMA_Transfer.o
- .debug_info      0x0031ba        0x52c build/default/production/CircularBuffer.o
- .debug_info      0x0036e6        0x8cb build/default/production/I2CdsPIC.o
- .debug_info      0x003fb1        0x322 build/default/production/Nmea0183.o
- .debug_info      0x0042d3        0x4e7 build/default/production/NMEAProtocol.o
- .debug_info      0x0047ba        0x1fe build/default/production/Conversions.o
- .debug_info      0x0049b8       0x5083 build/default/production/MCU_Board.o
- .debug_info      0x009a3b        0x9c0 build/default/production/LS7366R_SPI.o
+ .debug_info      0x000000       0x107b build/default/production/main.o
+ .debug_info      0x00107b       0x21c2 build/default/production/DMA_Transfer.o
+ .debug_info      0x00323d        0x52c build/default/production/CircularBuffer.o
+ .debug_info      0x003769        0x8cb build/default/production/I2CdsPIC.o
+ .debug_info      0x004034        0x322 build/default/production/Nmea0183.o
+ .debug_info      0x004356        0x4e7 build/default/production/NMEAProtocol.o
+ .debug_info      0x00483d        0x1fe build/default/production/Conversions.o
+ .debug_info      0x004a3b       0x5083 build/default/production/MCU_Board.o
+ .debug_info      0x009abe        0x9c0 build/default/production/LS7366R_SPI.o
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev     0x000000        0xaed
+.debug_abbrev     0x000000        0xb0f
  *(.debug_abbrev)
- .debug_abbrev    0x000000        0x1a1 build/default/production/main.o
- .debug_abbrev    0x0001a1        0x1d3 build/default/production/DMA_Transfer.o
- .debug_abbrev    0x000374         0xe4 build/default/production/CircularBuffer.o
- .debug_abbrev    0x000458        0x11f build/default/production/I2CdsPIC.o
- .debug_abbrev    0x000577         0xbc build/default/production/Nmea0183.o
- .debug_abbrev    0x000633        0x101 build/default/production/NMEAProtocol.o
- .debug_abbrev    0x000734         0x63 build/default/production/Conversions.o
- .debug_abbrev    0x000797        0x1d1 build/default/production/MCU_Board.o
- .debug_abbrev    0x000968        0x185 build/default/production/LS7366R_SPI.o
+ .debug_abbrev    0x000000        0x1c3 build/default/production/main.o
+ .debug_abbrev    0x0001c3        0x1d3 build/default/production/DMA_Transfer.o
+ .debug_abbrev    0x000396         0xe4 build/default/production/CircularBuffer.o
+ .debug_abbrev    0x00047a        0x11f build/default/production/I2CdsPIC.o
+ .debug_abbrev    0x000599         0xbc build/default/production/Nmea0183.o
+ .debug_abbrev    0x000655        0x101 build/default/production/NMEAProtocol.o
+ .debug_abbrev    0x000756         0x63 build/default/production/Conversions.o
+ .debug_abbrev    0x0007b9        0x1d1 build/default/production/MCU_Board.o
+ .debug_abbrev    0x00098a        0x185 build/default/production/LS7366R_SPI.o
 
-.debug_line       0x000000        0xad8
+.debug_line       0x000000        0xae7
  *(.debug_line)
- .debug_line      0x000000        0x1eb build/default/production/main.o
- .debug_line      0x0001eb        0x18e build/default/production/DMA_Transfer.o
- .debug_line      0x000379        0x124 build/default/production/CircularBuffer.o
- .debug_line      0x00049d        0x123 build/default/production/I2CdsPIC.o
- .debug_line      0x0005c0         0x69 build/default/production/Nmea0183.o
- .debug_line      0x000629        0x109 build/default/production/NMEAProtocol.o
- .debug_line      0x000732         0x9c build/default/production/Conversions.o
- .debug_line      0x0007ce        0x205 build/default/production/MCU_Board.o
- .debug_line      0x0009d3        0x105 build/default/production/LS7366R_SPI.o
+ .debug_line      0x000000        0x1fa build/default/production/main.o
+ .debug_line      0x0001fa        0x18e build/default/production/DMA_Transfer.o
+ .debug_line      0x000388        0x124 build/default/production/CircularBuffer.o
+ .debug_line      0x0004ac        0x123 build/default/production/I2CdsPIC.o
+ .debug_line      0x0005cf         0x69 build/default/production/Nmea0183.o
+ .debug_line      0x000638        0x109 build/default/production/NMEAProtocol.o
+ .debug_line      0x000741         0x9c build/default/production/Conversions.o
+ .debug_line      0x0007dd        0x205 build/default/production/MCU_Board.o
+ .debug_line      0x0009e2        0x105 build/default/production/LS7366R_SPI.o
 
 .debug_frame      0x000000        0x854
  *(.debug_frame)
@@ -3932,9 +3932,9 @@ __c30_signature
  __c30_signature
                   0x000ecb          0x6 c:/program files (x86)/microchip/xc16/v1.26/bin/bin/../../lib\libm-elf.a(umuldi3.epeo)
 
-_05E8B60057c63ffe
+_05E5B60057c651b0
                     0x7f40         0xc0
- _05E8B60057c63ffe
+ _05E5B60057c651b0
                     0x7f40         0xc0 build/default/production/DMA_Transfer.o
                     0x7f40                  _Ecan1Rx
 
@@ -4070,7 +4070,7 @@ _05E8B60057c63ffe
  .const             0x9e06         0x76 build/default/production/main.o
  .const             0x9e7c         0x16 build/default/production/NMEAProtocol.o
 
-.text             0x001e92       0x1a50
+.text             0x001e92       0x1b5c
  .text            0x001e92        0x8f8 build/default/production/MCU_Board.o
                   0x001e92                  _InitBoard
                   0x001ec4                  _MotorInit
@@ -4082,70 +4082,70 @@ _05E8B60057c63ffe
                   0x00258e                  _EventCheckInit
                   0x00259a                  __T7Interrupt
                   0x0025ba                  _selectCS
- .text            0x00278a        0x63c build/default/production/main.o
+ .text            0x00278a        0x748 build/default/production/main.o
                   0x00278a                  _main
-                  0x0029ca                  _EventChecker
-                  0x002a0c                  _manageEncoders
-                  0x002d94                  _manageMotors
-                  0x002dbe                  __CNInterrupt
- .text            0x002dc6        0x3b6 build/default/production/CircularBuffer.o
-                  0x002dc6                  _CB_Init
-                  0x002e2c                  _CB_ReadByte
-                  0x002ea6                  _CB_ReadMany
-                  0x002f22                  _CB_WriteByte
-                  0x002f86                  _CB_WriteMany
-                  0x003086                  _CB_Peek
-                  0x0030b4                  _CB_PeekMany
-                  0x003118                  _CB_Remove
- .text            0x00317c        0x324 build/default/production/NMEAProtocol.o
-                  0x00317c                  _InitDecoder
-                  0x00319e                  _DecodeStream
-                  0x0033ba                  _BuildSentence
-                  0x00344a                  _Hex2Dec
- .text            0x0034a0        0x234 build/default/production/DMA_Transfer.o
-                  0x0034a0                  _DMA0_UART2_Transfer
-                  0x0034dc                  _DMA1_UART2_Enable_RX
-                  0x003526                  _DMA2_SPI_Transfer
-                  0x003566                  _DMA3_SPI_Enable_RX
-                  0x0035a0                  _DMA4_CAN_Transfer
-                  0x0035d2                  _DMA5_CAN_Enable_RX
-                  0x0035de                  _DMA6_ADC_Enable
-                  0x003612                  __DMA0Interrupt
-                  0x00361a                  __DMA1Interrupt
-                  0x00366a                  __DMA2Interrupt
-                  0x003672                  __DMA3Interrupt
-                  0x003696                  __DMA4Interrupt
-                  0x00369e                  __DMA5Interrupt
-                  0x0036c2                  __DMA6Interrupt
- .text            0x0036d4        0x20e build/default/production/LS7366R_SPI.o
-                  0x0036d4                  _config_spi_slow
-                  0x0036f8                  _setQuadX4
-                  0x003706                  _set2ByteMode
-                  0x003714                  _writeDTRtoZerosLong
-                  0x00372e                  _writeDTRtoZeros
-                  0x003740                  _setCNTRtoDTR
-                  0x00374a                  _readEncLong
-                  0x003814                  _readEnc
-                  0x003854                  _read_SPI
-                  0x0038a8                  _write_SPI
+                  0x002a70                  _EventChecker
+                  0x002ab2                  _manageEncoders
+                  0x002e3a                  _manageMotors
+                  0x002eca                  __CNInterrupt
+ .text            0x002ed2        0x3b6 build/default/production/CircularBuffer.o
+                  0x002ed2                  _CB_Init
+                  0x002f38                  _CB_ReadByte
+                  0x002fb2                  _CB_ReadMany
+                  0x00302e                  _CB_WriteByte
+                  0x003092                  _CB_WriteMany
+                  0x003192                  _CB_Peek
+                  0x0031c0                  _CB_PeekMany
+                  0x003224                  _CB_Remove
+ .text            0x003288        0x324 build/default/production/NMEAProtocol.o
+                  0x003288                  _InitDecoder
+                  0x0032aa                  _DecodeStream
+                  0x0034c6                  _BuildSentence
+                  0x003556                  _Hex2Dec
+ .text            0x0035ac        0x234 build/default/production/DMA_Transfer.o
+                  0x0035ac                  _DMA0_UART2_Transfer
+                  0x0035e8                  _DMA1_UART2_Enable_RX
+                  0x003632                  _DMA2_SPI_Transfer
+                  0x003672                  _DMA3_SPI_Enable_RX
+                  0x0036ac                  _DMA4_CAN_Transfer
+                  0x0036de                  _DMA5_CAN_Enable_RX
+                  0x0036ea                  _DMA6_ADC_Enable
+                  0x00371e                  __DMA0Interrupt
+                  0x003726                  __DMA1Interrupt
+                  0x003776                  __DMA2Interrupt
+                  0x00377e                  __DMA3Interrupt
+                  0x0037a2                  __DMA4Interrupt
+                  0x0037aa                  __DMA5Interrupt
+                  0x0037ce                  __DMA6Interrupt
+ .text            0x0037e0        0x20e build/default/production/LS7366R_SPI.o
+                  0x0037e0                  _config_spi_slow
+                  0x003804                  _setQuadX4
+                  0x003812                  _set2ByteMode
+                  0x003820                  _writeDTRtoZerosLong
+                  0x00383a                  _writeDTRtoZeros
+                  0x00384c                  _setCNTRtoDTR
+                  0x003856                  _readEncLong
+                  0x003920                  _readEnc
+                  0x003960                  _read_SPI
+                  0x0039b4                  _write_SPI
 
-.dinit            0x0038e2        0x20a
- .dinit           0x0038e2        0x20a data_init
+.dinit            0x0039ee        0x20a
+ .dinit           0x0039ee        0x20a data_init
 
-.text             0x003aec        0x39e
- .text            0x003aec        0x1a6 build/default/production/Nmea0183.o
-                  0x003aec                  _buildAndCheckSentence
-                  0x003bb6                  _myTokenizer
-                  0x003c36                  _getChecksum
- .text            0x003c92        0x16a build/default/production/I2CdsPIC.o
-                  0x003c92                  _I2C_Init
-                  0x003ca4                  _I2C_WriteToReg
-                  0x003d1c                  _I2C_ReadFromReg
-                  0x003d32                  _I2C_ReadFromReg_Burst
- .text            0x003dfc         0x8e build/default/production/Conversions.o
-                  0x003dfc                  _hexchar2int
-                  0x003e3a                  _int2hexchar
-                  0x003e62                  _degMinToDeg
+.text             0x003bf8        0x39e
+ .text            0x003bf8        0x1a6 build/default/production/Nmea0183.o
+                  0x003bf8                  _buildAndCheckSentence
+                  0x003cc2                  _myTokenizer
+                  0x003d42                  _getChecksum
+ .text            0x003d9e        0x16a build/default/production/I2CdsPIC.o
+                  0x003d9e                  _I2C_Init
+                  0x003db0                  _I2C_WriteToReg
+                  0x003e28                  _I2C_ReadFromReg
+                  0x003e3e                  _I2C_ReadFromReg_Burst
+ .text            0x003f08         0x8e build/default/production/Conversions.o
+                  0x003f08                  _hexchar2int
+                  0x003f46                  _int2hexchar
+                  0x003f6e                  _degMinToDeg
 
-.shared.dinit     0x003e8a          0x2
- .shared.dinit    0x003e8a          0x2 shared_data_init
+.shared.dinit     0x003f96          0x2
+ .shared.dinit    0x003f96          0x2 shared_data_init

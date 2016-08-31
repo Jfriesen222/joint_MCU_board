@@ -47,7 +47,7 @@ void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, vo
 
 void MotorInit() {
     /* Set PWM Period on Primary Time Base */
-    PTPER = 1500;
+    PTPER = 700;
     /* Set Duty Cycles */
 
     /* Set Dead Time Values */
