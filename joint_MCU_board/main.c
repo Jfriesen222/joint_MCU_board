@@ -125,12 +125,17 @@ int main(void) {
             manageEncoders();
             LED1 = 0;
             
-            if (iii % 100 == 0) {
-          
-                size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
-                        robot_encoders.RL1_ENCDR, robot_encoders.RL2_ENCDR, robot_encoders.RL3_ENCDR, robot_encoders.RL4_ENCDR, robot_encoders.RL5_ENCDR, robot_encoders.RL6_ENCDR,
-                        robot_encoders.SF1_ENCDR, robot_encoders.SF2_ENCDR, robot_encoders.SF3_ENCDR, robot_encoders.SF4_ENCDR, robot_encoders.SF5_ENCDR, robot_encoders.SF6_ENCDR,
-                        robot_encoders.SA1_ENCDR, robot_encoders.SA2_ENCDR, robot_encoders.SA3_ENCDR, robot_encoders.SA4_ENCDR, robot_encoders.SA5_ENCDR, robot_encoders.SA6_ENCDR);
+            if (iii % 50 == 0) {
+                int pos = 0;
+//                size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
+//                        robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
+//                        robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
+//                        robot_encoders.SA_ENCDR[0][pos], robot_encoders.SA_ENCDR[1][pos], robot_encoders.SA_ENCDR[2][pos], robot_encoders.SA_ENCDR[3][pos], robot_encoders.SA_ENCDR[4][pos], robot_encoders.SA_ENCDR[5][pos]);
+//                
+                 size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
+                        robot_encoders.RL_VEL[0], robot_encoders.RL_VEL[1], robot_encoders.RL_VEL[2], robot_encoders.RL_VEL[3], robot_encoders.RL_VEL[4], robot_encoders.RL_VEL[5],
+                        robot_encoders.SF_VEL[0], robot_encoders.SF_VEL[1], robot_encoders.SF_VEL[2], robot_encoders.SF_VEL[3], robot_encoders.SF_VEL[4], robot_encoders.SF_VEL[5],
+                        robot_encoders.SA_VEL[0], robot_encoders.SA_VEL[1], robot_encoders.SA_VEL[2], robot_encoders.SA_VEL[3], robot_encoders.SA_VEL[4], robot_encoders.SA_VEL[5]);
 
                 //                size = sprintf((char *) out, "1: %5i %5i %5i %5i 2: %5i %5i %5i %5i 3: %5i %5i %5i %5i \r\n",
                 //                        SW1_1, SW2_1, SW3_1, SW4_1,
@@ -223,50 +228,61 @@ void manageEncoders() {
                 selectCS(~switchCS_1,~switchCS_2);
                 setCNTRtoDTR();
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-
                 selectCS(RL_ODD_1,RL_ODD_2);
                 readEncLong(&EncCtsLong);
+                int i, j;
+                for(i =0; i<6; i++) {
+                    for(j = 1; j>-1; j--) {
+                        robot_encoders.RL_ENCDR[i][j+1] = robot_encoders.RL_ENCDR[i][j];
+                        robot_encoders.SF_ENCDR[i][j+1] = robot_encoders.SF_ENCDR[i][j];
+                        robot_encoders.SA_ENCDR[i][j+1] = robot_encoders.SA_ENCDR[i][j];
+                    }
+                }
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                robot_encoders.RL1_ENCDR = EncCtsLong.cts1;
-                robot_encoders.RL3_ENCDR = EncCtsLong.cts2;
-                robot_encoders.RL5_ENCDR = EncCtsLong.cts3;
+                robot_encoders.RL_ENCDR[0][0] = EncCtsLong.cts1;
+                robot_encoders.RL_ENCDR[2][0] = EncCtsLong.cts2;
+                robot_encoders.RL_ENCDR[4][0] = EncCtsLong.cts3;
                 
                 selectCS(RL_EVEN_1, RL_EVEN_2);
                 readEncLong(&EncCtsLong);
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                robot_encoders.RL2_ENCDR = EncCtsLong.cts3;
-                robot_encoders.RL4_ENCDR = EncCtsLong.cts1;
-                robot_encoders.RL6_ENCDR = EncCtsLong.cts2;
+                robot_encoders.RL_ENCDR[1][0] = EncCtsLong.cts3;
+                robot_encoders.RL_ENCDR[3][0] = EncCtsLong.cts1;
+                robot_encoders.RL_ENCDR[5][0] = EncCtsLong.cts2;
                 
                 selectCS(SF_ODD_1, SF_ODD_2);
                 readEnc(&EncCts);
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                robot_encoders.SF1_ENCDR = -EncCts.cts3;
-                robot_encoders.SF3_ENCDR = -EncCts.cts1;
-                robot_encoders.SF5_ENCDR = -EncCts.cts2;
+                robot_encoders.SF_ENCDR[0][0] = -EncCts.cts3;
+                robot_encoders.SF_ENCDR[2][0] = -EncCts.cts1;
+                robot_encoders.SF_ENCDR[4][0] = -EncCts.cts2;
                 
                 selectCS(SF_EVEN_1, SF_EVEN_2);
                 readEnc(&EncCts);
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                robot_encoders.SF2_ENCDR = EncCts.cts1;
-                robot_encoders.SF4_ENCDR = EncCts.cts2;
-                robot_encoders.SF6_ENCDR = EncCts.cts3;
+                robot_encoders.SF_ENCDR[1][0] = EncCts.cts1;
+                robot_encoders.SF_ENCDR[3][0] = EncCts.cts2;
+                robot_encoders.SF_ENCDR[5][0] = EncCts.cts3;
                 
                 selectCS(SA_ODD_1,SA_ODD_2);
                 readEnc(&EncCts);
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                
-                robot_encoders.SA1_ENCDR =  EncCts.cts3;
-                robot_encoders.SA3_ENCDR =  EncCts.cts1;
-                robot_encoders.SA5_ENCDR =  EncCts.cts2;
+                robot_encoders.SA_ENCDR[0][0] =  EncCts.cts3;
+                robot_encoders.SA_ENCDR[2][0] =  EncCts.cts1;
+                robot_encoders.SA_ENCDR[4][0] =  EncCts.cts2;
                 
                 selectCS(SA_EVEN_1,SA_EVEN_2);
                 readEnc(&EncCts);
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                
-                robot_encoders.SA2_ENCDR = -EncCts.cts1;
-                robot_encoders.SA4_ENCDR = -EncCts.cts2;
-                robot_encoders.SA6_ENCDR = -EncCts.cts3;              
+                robot_encoders.SA_ENCDR[1][0] = -EncCts.cts1;
+                robot_encoders.SA_ENCDR[3][0] = -EncCts.cts2;
+                robot_encoders.SA_ENCDR[5][0] = -EncCts.cts3;
+                int h = 50; // data freq/2
+                for(i =0; i<6; i++) {
+                    robot_encoders.RL_VEL[i] = (9*robot_encoders.RL_VEL[i])/10 + (3*robot_encoders.RL_ENCDR[i][0] - 4*robot_encoders.RL_ENCDR[i][1] + robot_encoders.RL_ENCDR[i][2])*h;
+                    robot_encoders.SF_VEL[i] = (9*robot_encoders.SF_VEL[i])/10 + (3*robot_encoders.SF_ENCDR[i][0] - 4*robot_encoders.SF_ENCDR[i][1] + robot_encoders.SF_ENCDR[i][2])*h;
+                    robot_encoders.SA_VEL[i] = (9*robot_encoders.SA_VEL[i])/10 + (3*robot_encoders.SA_ENCDR[i][0] - 4*robot_encoders.SA_ENCDR[i][1] + robot_encoders.SA_ENCDR[i][2])*h;
+                }
 }
 
 void __attribute__((__interrupt__, no_auto_psv)) _CNInterrupt(void) {
