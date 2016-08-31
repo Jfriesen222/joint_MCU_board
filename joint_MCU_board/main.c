@@ -57,6 +57,7 @@ enum {
 
 void EventChecker(void);
 void manageEncoders(void);
+void manageMotors(void);
 
 int main(void) {
     commandSet.cmd1 = 0;
@@ -105,28 +106,14 @@ int main(void) {
     //Pass pointer to com protocol
     while (1) {
         if (events & EVENT_UPDATE_SPEED) {
-            RESET_3 = 1;
-            RESET_2 = 1;
-            RESET_1 = 1;
-            iii++;
-            int amplitude;
-            float freq;
-            freq = 200.0;
-            amplitude = 100;
-            
-            MOTOR1_3 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-            MOTOR2_3 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-            MOTOR1_1 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-            MOTOR2_1 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-            MOTOR1_2 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-            MOTOR2_2 = (int) (amplitude * sin(iii / freq) + PTPER / 2);
-            
+            iii++;          
             LED1 = 1;
             manageEncoders();
+            manageMotors();
             LED1 = 0;
             
             if (iii % 50 == 0) {
-                int pos = 0;
+//                int pos = 0;
 //                size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
 //                        robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
 //                        robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
@@ -144,7 +131,6 @@ int main(void) {
 
                 DMA0_UART2_Transfer(size, out);
                 //LED1 = (jj & 0b1);
-                LED1 = SW4_2;
                 LED2 = (jj & 0b10) >> 1;
                 LED3 = (jj & 0b100) >> 2;
                 LED4 = (jj & 0b1000) >> 3;
@@ -216,7 +202,7 @@ void EventChecker(void) {
 }
 
 void manageEncoders() {
-                uint32_t switchCS_1 = 0,switchCS_2 = 0 ;
+                uint16_t switchCS_1 = 0,switchCS_2 = 0 ;
                 
                 switchCS_2 = (S_SA1 * ~SA1_2) | (S_SF1 * ~SF1_2); 
                 switchCS_1 = (S_SA2 * ~SA2_1) | (S_SF2 * ~SF2_1) 
@@ -227,9 +213,7 @@ void manageEncoders() {
 
                 selectCS(~switchCS_1,~switchCS_2);
                 setCNTRtoDTR();
-                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                selectCS(RL_ODD_1,RL_ODD_2);
-                readEncLong(&EncCtsLong);
+                selectCS(ALL_CS_HIGH,ALL_CS_HIGH);        
                 int i, j;
                 for(i =0; i<6; i++) {
                     for(j = 1; j>-1; j--) {
@@ -238,10 +222,13 @@ void manageEncoders() {
                         robot_encoders.SA_ENCDR[i][j+1] = robot_encoders.SA_ENCDR[i][j];
                     }
                 }
+                
+                selectCS(RL_ODD_1,RL_ODD_2);
+                readEncLong(&EncCtsLong);
                 selectCS(ALL_CS_HIGH,ALL_CS_HIGH);
-                robot_encoders.RL_ENCDR[0][0] = EncCtsLong.cts1;
-                robot_encoders.RL_ENCDR[2][0] = EncCtsLong.cts2;
-                robot_encoders.RL_ENCDR[4][0] = EncCtsLong.cts3;
+                robot_encoders.RL_ENCDR[0][0] = -EncCtsLong.cts1;
+                robot_encoders.RL_ENCDR[2][0] = -EncCtsLong.cts2;
+                robot_encoders.RL_ENCDR[4][0] = -EncCtsLong.cts3;
                 
                 selectCS(RL_EVEN_1, RL_EVEN_2);
                 readEncLong(&EncCtsLong);
@@ -277,12 +264,21 @@ void manageEncoders() {
                 robot_encoders.SA_ENCDR[1][0] = -EncCts.cts1;
                 robot_encoders.SA_ENCDR[3][0] = -EncCts.cts2;
                 robot_encoders.SA_ENCDR[5][0] = -EncCts.cts3;
-                int h = 50; // data freq/2
+                int h = 50; // data freq/(2*10)
                 for(i =0; i<6; i++) {
                     robot_encoders.RL_VEL[i] = (9*robot_encoders.RL_VEL[i])/10 + (3*robot_encoders.RL_ENCDR[i][0] - 4*robot_encoders.RL_ENCDR[i][1] + robot_encoders.RL_ENCDR[i][2])*h;
                     robot_encoders.SF_VEL[i] = (9*robot_encoders.SF_VEL[i])/10 + (3*robot_encoders.SF_ENCDR[i][0] - 4*robot_encoders.SF_ENCDR[i][1] + robot_encoders.SF_ENCDR[i][2])*h;
                     robot_encoders.SA_VEL[i] = (9*robot_encoders.SA_VEL[i])/10 + (3*robot_encoders.SA_ENCDR[i][0] - 4*robot_encoders.SA_ENCDR[i][1] + robot_encoders.SA_ENCDR[i][2])*h;
                 }
+}
+
+void manageMotors() {
+            MOTOR1 = PTPER / 2;
+            MOTOR2 = PTPER / 2;
+            MOTOR3 = PTPER / 2;
+            MOTOR4 = PTPER / 2;
+            MOTOR5 = PTPER / 2;
+            MOTOR6 = PTPER / 2;            
 }
 
 void __attribute__((__interrupt__, no_auto_psv)) _CNInterrupt(void) {

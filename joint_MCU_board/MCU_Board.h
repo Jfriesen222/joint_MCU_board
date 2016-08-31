@@ -24,7 +24,14 @@
 #define MOTOR1_3                PDC2                 
 #define MOTOR2_3                PDC1
 #define MOTOR1_3R               SDC5                 
-#define MOTOR2_3R               SDC6  
+#define MOTOR2_3R               SDC6 
+
+#define MOTOR1                  MOTOR2_1                
+#define MOTOR2                  MOTOR1_3                
+#define MOTOR3                  MOTOR2_2                
+#define MOTOR4                  MOTOR1_1                
+#define MOTOR5                  MOTOR2_3                
+#define MOTOR6                  MOTOR1_2 
 
 /* LEDs */
 #define TRIS_LED1               TRISBbits.TRISB15
