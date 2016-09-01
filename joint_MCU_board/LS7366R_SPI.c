@@ -138,6 +138,16 @@ void readEnc(EncoderCts *EncVals) {
     EncVals->cts3 = count_value;
 }
 
+void readCountMode(tripSPIdata *count_mode){
+    write_SPI(READ_MDR0);
+    read_SPI(0x00, &cntData1);
+    
+    count_mode->data1 = cntData1.data1;
+    count_mode->data2 = cntData1.data2;
+    count_mode->data3 = cntData1.data3;
+    
+}
+
 void read_SPI(int command, tripSPIdata *datas) {
     int bufVal;
     bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag

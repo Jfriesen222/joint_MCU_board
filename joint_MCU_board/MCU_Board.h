@@ -23,15 +23,21 @@
 
 #define MOTOR1_3                PDC2                 
 #define MOTOR2_3                PDC1
-#define MOTOR1_3R               SDC5                 
-#define MOTOR2_3R               SDC6 
+#define MOTOR1_3R               SDC2                 
+#define MOTOR2_3R               SDC1 
 
-#define MOTOR0                  MOTOR1_1                
-#define MOTOR1                  MOTOR2_3                
-#define MOTOR2                  MOTOR1_2                
-#define MOTOR3                  MOTOR2_1                
-#define MOTOR4                  MOTOR1_3                
+#define MOTOR0                  MOTOR1_1
+#define MOTOR0R                 MOTOR1_1R
+#define MOTOR1                  MOTOR2_3 
+#define MOTOR1R                 MOTOR2_3R
+#define MOTOR2                  MOTOR1_2   
+#define MOTOR2R                 MOTOR1_2R
+#define MOTOR3                  MOTOR2_1  
+#define MOTOR3R                 MOTOR2_1R
+#define MOTOR4                  MOTOR1_3      
+#define MOTOR4R                 MOTOR1_3R
 #define MOTOR5                  MOTOR2_2 
+#define MOTOR5R                 MOTOR2_2R
 
 /* LEDs */
 #define TRIS_LED1               TRISBbits.TRISB15
@@ -215,5 +221,15 @@ typedef struct{
     int SA_VEL[6];
 } Robot_Encoders; 
 
+typedef struct{
+    uint8_t SF[6];
+    uint8_t SA[6];
+} Robot_Switches; 
+
+
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback);
 void selectCS(uint16_t cs_bits1, uint16_t cs_bits2 );
+void readSwitches(Robot_Switches *robot_switches);
+bool checkSPIbus();
+void haltAndCatchFire(unsigned int *message);
+void setMotors(int *duty_cycle);

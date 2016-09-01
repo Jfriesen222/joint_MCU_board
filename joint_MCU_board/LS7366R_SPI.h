@@ -119,6 +119,7 @@ void writeDTRtoZeros();
 void setCNTRtoDTR();
 void readEncLong(EncoderCtsLong *EncVals);
 void readEnc(EncoderCts *EncVals);
+void readCountMode(tripSPIdata *count_mode);
 void read_SPI(int command, tripSPIdata *datas);
 void write_SPI(int command);
 
