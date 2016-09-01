@@ -242,6 +242,6 @@ typedef struct{
 void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, void *eventCallback);
 void selectCS(uint16_t cs_bits1, uint16_t cs_bits2 );
 void readSwitches(Robot_Switches *robot_switches);
-bool checkSPIbus();
+int checkSPIbus();
 void haltAndCatchFire(unsigned int *message);
 void setMotors(int *duty_cycle);

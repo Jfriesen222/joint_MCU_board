@@ -387,52 +387,75 @@ void haltAndCatchFire(unsigned int *message) {
     while (1);
 }
 
-bool checkSPIbus() {
+int checkSPIbus() {
     tripSPIdata register_data;
     int quadrx4 = QUADRX4;
-    
     
     selectCS(RL_ODD_1, RL_ODD_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    if ((register_data.data1 != quadrx4) || (register_data.data2 != quadrx4) || (register_data.data3 != quadrx4)) {
-        return false;
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
     }
-
+    
     selectCS(RL_EVEN_1, RL_EVEN_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    if ((register_data.data1 != quadrx4) || (register_data.data2 != quadrx4) || (register_data.data3 != quadrx4)) {
-        return false;
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
     }
 
     selectCS(SF_ODD_1, SF_ODD_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    if ((register_data.data1 != quadrx4) || (register_data.data2 != quadrx4) || (register_data.data3 != quadrx4)) {
-        return false;
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
     }
 
     selectCS(SF_EVEN_1, SF_EVEN_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    if ((register_data.data1 != quadrx4) || (register_data.data2 != quadrx4) || (register_data.data3 != quadrx4)) {
-        return false;
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
     }
-
+    
     selectCS(SA_ODD_1, SA_ODD_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    if ((register_data.data1 != quadrx4) || (register_data.data2 != quadrx4) || (register_data.data3 != quadrx4)) {
-        return false;
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
     }
-
+    
     selectCS(SA_EVEN_1, SA_EVEN_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    if ((register_data.data1 != quadrx4) || (register_data.data2 != quadrx4) || (register_data.data3 != quadrx4)) {
-        return false;
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
     }
 
-    return true;
+    return 0;
 }
