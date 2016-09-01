@@ -391,6 +391,7 @@ bool checkSPIbus() {
     tripSPIdata register_data;
     int quadrx4 = QUADRX4;
     
+    
     selectCS(RL_ODD_1, RL_ODD_2);
     readCountMode(&register_data);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);

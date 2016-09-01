@@ -28,8 +28,7 @@
 
 /* Force constraints  */
 #define MAX_FORCE 80
-#define MIN_FORCE 2
-
+#define MIN_FORCE 10
 long int SA_MAX_VEL = 2000;
 long int SF_MAX_VEL = 1000;
 
@@ -46,6 +45,8 @@ tripSPIdata RegData;
 
 Robot_Encoders robot_encoders;
 Robot_Switches robot_switches;
+
+int spi_error_count = 0;
 
 uint16_t events;
 bool controller;
@@ -137,24 +138,39 @@ int main(void) {
             if (iii % 50 == 0) {
                 int pos = 0;
                 if (!checkSPIbus()) {
-                    haltAndCatchFire((unsigned int *) "SPI bus failure\r\n");
+                    if (spi_error_count >= 3) {
+                        haltAndCatchFire((unsigned int *) "SPI bus failure\r\n");
+                    } else {
+                        putsUART2((unsigned int *) "SPI bus error\r\n");
+                        spi_error_count++;
+
+                        size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d SPI ERROR \r\n",
+                                robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
+                                robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
+                                targetForce[0], targetForce[1], targetForce[2], targetForce[3], targetForce[4], targetForce[5]);
+
+                        DMA0_UART2_Transfer(size, out);
+                    }
+                } else {
+                    spi_error_count = 0;
+
+                    size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
+                            robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
+                            robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
+                            targetForce[0], targetForce[1], targetForce[2], targetForce[3], targetForce[4], targetForce[5]);
+
+                    //                 size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
+                    //                        robot_encoders.RL_VEL[0], robot_encoders.RL_VEL[1], robot_encoders.RL_VEL[2], robot_encoders.RL_VEL[3], robot_encoders.RL_VEL[4], robot_encoders.RL_VEL[5],
+                    //                        robot_encoders.SF_VEL[0], robot_encoders.SF_VEL[1], robot_encoders.SF_VEL[2], robot_encoders.SF_VEL[3], robot_encoders.SF_VEL[4], robot_encoders.SF_VEL[5],
+                    //                        robot_encoders.SA_VEL[0], robot_encoders.SA_VEL[1], robot_encoders.SA_VEL[2], robot_encoders.SA_VEL[3], robot_encoders.SA_VEL[4], robot_encoders.SA_VEL[5]);
+
+                    //                size = sprintf((char *) out, "1: %5i %5i %5i %5i 2: %5i %5i %5i %5i 3: %5i %5i %5i %5i \r\n",
+                    //                        SW1_1, SW2_1, SW3_1, SW4_1,
+                    //                        SW1_2, SW2_2, SW3_2, SW4_2,
+                    //                        S_SF6, SW2_3, SW3_3, SW4_3);
+
+                    DMA0_UART2_Transfer(size, out);
                 }
-                size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d %6d\r\n",
-                        robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
-                        robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
-                        targetForce[0], targetForce[1], targetForce[2], targetForce[3], targetForce[4], targetForce[5]);
-
-                //                 size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
-                //                        robot_encoders.RL_VEL[0], robot_encoders.RL_VEL[1], robot_encoders.RL_VEL[2], robot_encoders.RL_VEL[3], robot_encoders.RL_VEL[4], robot_encoders.RL_VEL[5],
-                //                        robot_encoders.SF_VEL[0], robot_encoders.SF_VEL[1], robot_encoders.SF_VEL[2], robot_encoders.SF_VEL[3], robot_encoders.SF_VEL[4], robot_encoders.SF_VEL[5],
-                //                        robot_encoders.SA_VEL[0], robot_encoders.SA_VEL[1], robot_encoders.SA_VEL[2], robot_encoders.SA_VEL[3], robot_encoders.SA_VEL[4], robot_encoders.SA_VEL[5]);
-
-                //                size = sprintf((char *) out, "1: %5i %5i %5i %5i 2: %5i %5i %5i %5i 3: %5i %5i %5i %5i \r\n",
-                //                        SW1_1, SW2_1, SW3_1, SW4_1,
-                //                        SW1_2, SW2_2, SW3_2, SW4_2,
-                //                        S_SF6, SW2_3, SW3_3, SW4_3);
-
-                DMA0_UART2_Transfer(size, out);
                 //LED1 = (jj & 0b1);
                 LED2 = (jj & 0b10) >> 1;
                 LED3 = (jj & 0b100) >> 2;
@@ -231,16 +247,16 @@ void manageEncoders() {
     uint16_t switchCS_1 = 0, switchCS_2 = 0;
     readSwitches(&robot_switches);
 
-    switchCS_2 = (robot_switches.SA[0] * ~SA1_2) | (robot_switches.SF[0] * ~SF1_2);
-    switchCS_1 = (robot_switches.SA[1] * ~SA2_1) | (robot_switches.SF[1] * ~SF2_1)
-            | (robot_switches.SA[2] * ~SA3_1) | (robot_switches.SF[2] * ~SF3_1)
-            | (robot_switches.SA[3] * ~SA4_1) | (robot_switches.SF[3] * ~SF4_1)
-            | (robot_switches.SA[4] * ~SA5_1) | (robot_switches.SF[4] * ~SF5_1)
-            | (robot_switches.SA[5] * ~SA6_1) | (robot_switches.SF[5] * ~SF6_1);
+//    switchCS_2 = (robot_switches.SA[0] * ~SA1_2) | (robot_switches.SF[0] * ~SF1_2);
+//    switchCS_1 = (robot_switches.SA[1] * ~SA2_1) | (robot_switches.SF[1] * ~SF2_1)
+//            | (robot_switches.SA[2] * ~SA3_1) | (robot_switches.SF[2] * ~SF3_1)
+//            | (robot_switches.SA[3] * ~SA4_1) | (robot_switches.SF[3] * ~SF4_1)
+//            | (robot_switches.SA[4] * ~SA5_1) | (robot_switches.SF[4] * ~SF5_1)
+//            | (robot_switches.SA[5] * ~SA6_1) | (robot_switches.SF[5] * ~SF6_1);
 
-    selectCS(~switchCS_1, ~switchCS_2);
-    setCNTRtoDTR();
-    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+//    selectCS(~switchCS_1, ~switchCS_2);
+//    setCNTRtoDTR();
+//    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
     int i, j;
     for (i = 0; i < 6; i++) {
         for (j = 1; j>-1; j--) {
@@ -292,10 +308,10 @@ void manageEncoders() {
     robot_encoders.SA_ENCDR[3][0] = -EncCts.cts2;
     robot_encoders.SA_ENCDR[5][0] = -EncCts.cts3;
 
-    for (i = 0; i < 6; i++) {
-        robot_encoders.SA_ENCDR[i][0] = robot_encoders.SA_ENCDR[i][0]*(1 - robot_switches.SA[i]);
-        robot_encoders.SF_ENCDR[i][0] = robot_encoders.SF_ENCDR[i][0]*(1 - robot_switches.SF[i]);
-    }
+//    for (i = 0; i < 6; i++) {
+//        robot_encoders.SA_ENCDR[i][0] = robot_encoders.SA_ENCDR[i][0]*(1 - robot_switches.SA[i]);
+//        robot_encoders.SF_ENCDR[i][0] = robot_encoders.SF_ENCDR[i][0]*(1 - robot_switches.SF[i]);
+//    }
     int h = 50; // data freq/(2*10)
     for (i = 0; i < 6; i++) {
         robot_encoders.RL_VEL[i] = (9 * robot_encoders.RL_VEL[i]) / 10 + (3 * robot_encoders.RL_ENCDR[i][0] - 4 * robot_encoders.RL_ENCDR[i][1] + robot_encoders.RL_ENCDR[i][2]) * h;
@@ -316,12 +332,12 @@ void manageMotors(int *targetForce) {
 
 void PositionPD(int *targetForce) {
     long int targetPosition[6];
-    targetPosition[0] = -150000;
-    targetPosition[1] = -150000;
-    targetPosition[2] = -150000;
-    targetPosition[3] = -150000;
-    targetPosition[4] = -150000;
-    targetPosition[5] = -150000;
+    targetPosition[0] = -200000;
+    targetPosition[1] = -200000;
+    targetPosition[2] = -200000;
+    targetPosition[3] = -200000;
+    targetPosition[4] = -200000;
+    targetPosition[5] = -200000;
     int jj = 0;
     for (jj = 0; jj < 6; jj++) {
         targetForce[jj] = -(targetPosition[jj] - robot_encoders.RL_ENCDR[jj][0]) / POS_Kp;
