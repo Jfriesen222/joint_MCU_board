@@ -37,16 +37,17 @@
 #include <stdint.h>
 
 typedef struct {
-    uint8_t sentence[64];
-    uint16_t checksum;
+    uint8_t sentence[200];
+    uint8_t checksum;
 } NMEA_0183_Sentence;
 
 typedef struct {
-    int cmd1;
-    int cmd2;
-    int cmd3;
-    int cmd4;
-    int cmd5;
+    long int cmd1;
+    long int cmd2;
+    long int cmd3;
+    long int cmd4;
+    long int cmd5;
+    long int cmd6;
 } Commands;
 
 typedef Commands actuatorCommands;

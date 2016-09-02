@@ -1,8 +1,11 @@
 #include "MCU_Board.h"
+#include "LS7366R_SPI.h"
 #include <timer.h>
 #include <uart.h>
+#include <math.h>
 #include <pps.h>
 #include <p33ep256mu810.h>
+#include <stdlib.h>
 
 _FOSCSEL(FNOSC_FRC & IESO_OFF);
 _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_NONE);
@@ -47,14 +50,14 @@ void InitBoard(ADCBuffer *ADBuff, CircularBuffer *cB, CircularBuffer *spi_cB, vo
 
 void MotorInit() {
     /* Set PWM Period on Primary Time Base */
-    PTPER = 700;
+    PTPER = 1000;
     /* Set Duty Cycles */
 
     /* Set Dead Time Values */
     DTR1 = DTR2 = DTR3 = DTR4 = DTR5 = DTR6 = 0;
     ALTDTR1 = ALTDTR2 = ALTDTR3 = ALTDTR4 = ALTDTR5 = ALTDTR6 = 0;
     /* Set PWM Mode to Complementary */
-    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xC000; //independent >0xCC00;
+    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xCC00; //independent >0xCC00;
     /* Set Primary Time Base, Edge-Aligned Mode and Independent Duty Cycles */
     PWMCON1 = PWMCON2 = PWMCON3 = PWMCON4 = PWMCON5 = PWMCON6 = 0x0000;
     /* Configure Faults */
@@ -71,7 +74,7 @@ void UART2Init(void) {
     U2MODEbits.PDSEL = 0; // No parity, 8-data bits
     U2MODEbits.ABAUD = 0; // Auto-baud disabled
     U2MODEbits.BRGH = 1; // High speed UART mode...
-    U2BRG = 18; //455 for 9600,227 for 19200, 113 for 38400,  37 for 115200 on BRGH 0, 460800 on BRGH 1, 921600 = 19
+    U2BRG = 37; //455 for 9600,227 for 19200, 113 for 38400,  37 for 115200 on BRGH 0, 460800 on BRGH 1, 921600 = 19
     //BRGH = 0, BRG = 18 for 230400, BRG = 17 BRGH = 0 for 25000
     U2STAbits.UTXISEL0 = 0; // int on last character shifted out tx register
     U2STAbits.UTXISEL1 = 0; // int on last character shifted out tx register
@@ -191,6 +194,10 @@ void PinInit(void) {
     TRISFbits.TRISF3 = 0;
     TRISFbits.TRISF4 = 0;
     TRISFbits.TRISF5 = 1; //sdi
+    
+    TRISDbits.TRISD5 = 1;
+    ODCDbits.ODCD5 = 0;
+    CNPUDbits.CNPUD5 = 0;
 
     //__builtin_write_OSCCONL(OSCCON & ~(1 << 6));
     //OUT_PIN_PPS_RP67 = OUT_FN_PPS_U2TX; //U2Tx
@@ -231,7 +238,7 @@ void TimersInit(void) {
     T7CONbits.TGATE = 0;
     T7CONbits.TCKPS = 0b11; // Select 1:256 Prescaler
     TMR7 = 0x00;
-    PR7 = 0x00112; //Approximately 5kHz... 0x0112 For 1kHz  0x0037 for 5kHz
+    PR7 = 0x0112; //Approximately 5kHz... 0x0112 For 1kHz  0x0027 for 5kHz
     IPC12bits.T7IP = 0x01;
     IFS3bits.T7IF = 0;
     IEC3bits.T7IE = 1;
@@ -318,24 +325,141 @@ void __attribute__((__interrupt__, no_auto_psv)) _T7Interrupt(void) {
     IFS3bits.T7IF = 0; // Clear Timer1 Interrupt Flag
 }
 
-void selectCS(uint16_t cs_bits1, uint16_t cs_bits2 ){
-    CS1_1 =  (0b0000000000000001)&(cs_bits1);
-    CS2_1 = ((0b0000000000000010)&(cs_bits1))>> 1;
-    CS3_1 = ((0b0000000000000100)&(cs_bits1))>> 2;
-    CS4_1 = ((0b0000000000001000)&(cs_bits1))>> 3;
-    CS5_1 = ((0b0000000000010000)&(cs_bits1))>> 4;
-    CS6_1 = ((0b0000000000100000)&(cs_bits1))>> 5; 
-    CS1_2 = ((0b0000000001000000)&(cs_bits1))>> 6;
-    CS2_2 = ((0b0000000010000000)&(cs_bits1))>> 7;
-    CS3_2 = ((0b0000000100000000)&(cs_bits1))>> 8;
-    CS4_2 = ((0b0000001000000000)&(cs_bits1))>> 9;
-    CS5_2 = ((0b0000010000000000)&(cs_bits1))>>10;
-    CS6_2 = ((0b0000100000000000)&(cs_bits1))>>11;
-    CS1_3 = ((0b0001000000000000)&(cs_bits1))>>12;
-    CS2_3 = ((0b0010000000000000)&(cs_bits1))>>13;
-    CS3_3 = ((0b0100000000000000)&(cs_bits1))>>14;
-    CS4_3 = ((0b1000000000000000)&(cs_bits1))>>15;
+void selectCS(uint16_t cs_bits1, uint16_t cs_bits2) {
+    CS1_1 = (0b0000000000000001)&(cs_bits1);
+    CS2_1 = ((0b0000000000000010)&(cs_bits1)) >> 1;
+    CS3_1 = ((0b0000000000000100)&(cs_bits1)) >> 2;
+    CS4_1 = ((0b0000000000001000)&(cs_bits1)) >> 3;
+    CS5_1 = ((0b0000000000010000)&(cs_bits1)) >> 4;
+    CS6_1 = ((0b0000000000100000)&(cs_bits1)) >> 5;
+    CS1_2 = ((0b0000000001000000)&(cs_bits1)) >> 6;
+    CS2_2 = ((0b0000000010000000)&(cs_bits1)) >> 7;
+    CS3_2 = ((0b0000000100000000)&(cs_bits1)) >> 8;
+    CS4_2 = ((0b0000001000000000)&(cs_bits1)) >> 9;
+    CS5_2 = ((0b0000010000000000)&(cs_bits1)) >> 10;
+    CS6_2 = ((0b0000100000000000)&(cs_bits1)) >> 11;
+    CS1_3 = ((0b0001000000000000)&(cs_bits1)) >> 12;
+    CS2_3 = ((0b0010000000000000)&(cs_bits1)) >> 13;
+    CS3_3 = ((0b0100000000000000)&(cs_bits1)) >> 14;
+    CS4_3 = ((0b1000000000000000)&(cs_bits1)) >> 15;
     CS5_3 = ((0b0000000000000001)&(cs_bits2));
-    CS6_3 = ((0b0000000000000010)&(cs_bits2))>>1;  
+    CS6_3 = ((0b0000000000000010)&(cs_bits2)) >> 1;
 }
 
+void readSwitches(Robot_Switches *robot_switches) {
+    robot_switches->SF[0] = S_SF1;
+    robot_switches->SF[1] = S_SF2;
+    robot_switches->SF[2] = S_SF3;
+    robot_switches->SF[3] = S_SF4;
+    robot_switches->SF[4] = S_SF5;
+    robot_switches->SF[5] = S_SF6;
+
+    robot_switches->SA[0] = S_SA1;
+    robot_switches->SA[1] = S_SA2;
+    robot_switches->SA[2] = S_SA3;
+    robot_switches->SA[3] = S_SA4;
+    robot_switches->SA[4] = S_SA5;
+    robot_switches->SA[5] = S_SA6;
+}
+
+void setMotors(int *duty_cycle) {
+    //duty cycle is -1000 to 1000 
+    MOTOR0 = (duty_cycle[0] + abs(duty_cycle[0])) / 2;
+    MOTOR0R = -(duty_cycle[0] - abs(duty_cycle[0])) / 2;
+    MOTOR1 = (duty_cycle[1] + abs(duty_cycle[1])) / 2;
+    MOTOR1R = -(duty_cycle[1] - abs(duty_cycle[1])) / 2;
+    MOTOR2 = (duty_cycle[2] + abs(duty_cycle[2])) / 2;
+    MOTOR2R = -(duty_cycle[2] - abs(duty_cycle[2])) / 2;
+    MOTOR3 = (duty_cycle[3] + abs(duty_cycle[3])) / 2;
+    MOTOR3R = -(duty_cycle[3] - abs(duty_cycle[3])) / 2;
+    MOTOR4 = (duty_cycle[4] + abs(duty_cycle[4])) / 2;
+    MOTOR4R = -(duty_cycle[4] - abs(duty_cycle[4])) / 2;
+    MOTOR5 = (duty_cycle[5] + abs(duty_cycle[5])) / 2;
+    MOTOR5R = -(duty_cycle[5] - abs(duty_cycle[5])) / 2;
+}
+
+void haltAndCatchFire(unsigned int *message) {
+    putsUART2(message);
+    PTPER = 500;
+    IOCON1 = IOCON2 = IOCON3 = IOCON4 = IOCON5 = IOCON6 = 0xC000;
+    MOTOR0 = PTPER / 2;
+    MOTOR1 = PTPER / 2;
+    MOTOR2 = PTPER / 2;
+    MOTOR3 = PTPER / 2;
+    MOTOR4 = PTPER / 2;
+    MOTOR5 = PTPER / 2;
+    while (1);
+}
+
+int checkSPIbus() {
+    tripSPIdata register_data;
+    int quadrx4 = QUADRX4;
+    
+    selectCS(RL_ODD_1, RL_ODD_2);
+    readCountMode(&register_data);
+    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
+    }
+    
+    selectCS(RL_EVEN_1, RL_EVEN_2);
+    readCountMode(&register_data);
+    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
+    }
+
+    selectCS(SF_ODD_1, SF_ODD_2);
+    readCountMode(&register_data);
+    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
+    }
+
+    selectCS(SF_EVEN_1, SF_EVEN_2);
+    readCountMode(&register_data);
+    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
+    }
+    
+    selectCS(SA_ODD_1, SA_ODD_2);
+    readCountMode(&register_data);
+    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
+    }
+    
+    selectCS(SA_EVEN_1, SA_EVEN_2);
+    readCountMode(&register_data);
+    selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
+    if (register_data.data1 != quadrx4){
+        return 1;
+    } else if (register_data.data2 != quadrx4) {
+        return 2;
+    } else if (register_data.data3 != quadrx4) {
+        return 3;
+    }
+
+    return 0;
+}
