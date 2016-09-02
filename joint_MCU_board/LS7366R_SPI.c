@@ -171,4 +171,7 @@ void write_SPI(int command) {
     SPI2BUF = command; // write the data out to the SPI peripheral
     SPI3BUF = command; // write the data out to the SPI peripheral
     while ((!SPI1STATbits.SPIRBF) || (!SPI2STATbits.SPIRBF) || (!SPI3STATbits.SPIRBF)); // wait for the data to be sent out
+    bufVal = SPI1BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    bufVal = SPI2BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
+    bufVal = SPI3BUF; // dummy read of the SPI1BUF register to clear the SPIRBF flag
 }

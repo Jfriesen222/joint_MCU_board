@@ -42,11 +42,12 @@ typedef struct {
 } NMEA_0183_Sentence;
 
 typedef struct {
-    int cmd1;
-    int cmd2;
-    int cmd3;
-    int cmd4;
-    int cmd5;
+    long int cmd1;
+    long int cmd2;
+    long int cmd3;
+    long int cmd4;
+    long int cmd5;
+    long int cmd6;
 } Commands;
 
 typedef Commands actuatorCommands;

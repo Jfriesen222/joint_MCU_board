@@ -22,13 +22,14 @@
 
 /* Control Gains */
 #define MAX_RL -1000
-#define FORCE_Kp 200
-#define POS_Kp 1000
-#define POS_Kd 1
+#define FORCE_Kp 125
+#define POS_Kp 750
+#define POS_Kd 2000
 
+//#define RECALIBRATION
 /* Force constraints  */
-#define MAX_FORCE 80
-#define MIN_FORCE 10
+#define MAX_FORCE 160
+#define MIN_FORCE 40
 long int SA_MAX_VEL = 2000;
 long int SF_MAX_VEL = 1000;
 
@@ -72,13 +73,15 @@ void EventChecker(void);
 void manageEncoders(void);
 void manageMotors(int *targetForce);
 void PositionPD(int *targetForce);
+long int targetPosition[6];
 
 int main(void) {
-    commandSet.cmd1 = 0;
-    commandSet.cmd2 = 0;
-    commandSet.cmd3 = 0;
-    commandSet.cmd4 = 0;
-    commandSet.cmd5 = 0;
+    commandSet.cmd1 = -225000;
+    commandSet.cmd2 = -225000;
+    commandSet.cmd3 = -225000;
+    commandSet.cmd4 = -225000;
+    commandSet.cmd5 = -225000;
+    commandSet.cmd6 = -225000;
     static uint8_t out[500];
     static uint8_t size;
     int targetForce[6];
@@ -86,9 +89,17 @@ int main(void) {
     CB_Init(&spiBuffer, (uint8_t *) spiBuf, 128);
     InitBoard(&ADCBuff, &uartBuffer, &spiBuffer, EventChecker);
 
+    targetPosition[0] = commandSet.cmd1;
+    targetPosition[1] = commandSet.cmd2;
+    targetPosition[2] = commandSet.cmd3;
+    targetPosition[3] = commandSet.cmd4;
+    targetPosition[4] = commandSet.cmd5;
+    targetPosition[5] = commandSet.cmd6;
+
     config_spi_slow();
 
     /* Set encoder counters to the quadrature mode */
+#ifdef RECALIBRATION
     selectCS(ALL_CS_LOW, ALL_CS_LOW);
     setQuadX4();
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
@@ -96,6 +107,7 @@ int main(void) {
     if (checkSPIbus() != 0) {
         haltAndCatchFire((unsigned int *) "SPI bus failure\r\n");
     }
+
 
     selectCS(SF_ODD_1 & SF_EVEN_1 & SA_ODD_1&SA_EVEN_1, SF_ODD_2 & SF_EVEN_2 & SA_ODD_2 & SA_EVEN_2);
     set2ByteMode();
@@ -116,8 +128,9 @@ int main(void) {
     /*check to make sure all of the limits switches are down, if not then hold and a make all of the motors make noise*/
     readSwitches(&robot_switches);
     if (robot_switches.SF[0] + robot_switches.SF[1] + robot_switches.SF[2] + robot_switches.SF[3] + robot_switches.SF[4] + robot_switches.SF[5] != 6) {
-        haltAndCatchFire((unsigned int *) "Limit Switch not pressed\r\n");
+        haltAndCatchFire((unsigned int *) "Limit Switch not pressed, cables taught\r\n");
     }
+#endif
 
     putsUART2((unsigned int *) "Init. Complete\r\n");
     controller = 0;
@@ -145,7 +158,7 @@ int main(void) {
                     } else {
                         spi_error_count++;
 
-                        size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d SPI ERROR %6d \r\n",
+                        size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n SPI ERROR %6d \r\n",
                                 robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
                                 robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
                                 targetForce[0], targetForce[1], targetForce[2], targetForce[3], targetForce[4], targetForce[5], spi_integrity);
@@ -185,18 +198,16 @@ int main(void) {
         if (events & EVENT_UART_DATA_READY) {
             uint8_t data;
             CB_ReadByte(&uartBuffer, &data);
-            size = sprintf(out, "%c", data);
-            DMA0_UART2_Transfer(size, out);         
-            RESET_1 = RESET_2 = RESET_3 = 0;
-            long int ii;
-
-            RESET_1 = RESET_2 = RESET_3 = 1;
-
+            //            size = sprintf(out, "%c", data);
+            //            DMA0_UART2_Transfer(size, out);         
+            putsUART2(&data);
+            //RESET_1 = RESET_2 = RESET_3 = !RESET_1;
+            
             //LED7 = !LED7;
             //                                                LED8 = 1;
-//            if (DecodeStream(data)) {
-//                events |= EVENT_UPDATE_LENGTHS;
-//            }
+            if (DecodeStream(data)) {
+                events |= EVENT_UPDATE_LENGTHS;
+            }
             events &= ~EVENT_UART_DATA_READY;
         }
 
@@ -230,7 +241,6 @@ void EventChecker(void) {
 #ifndef CHARACTERIZE
     if (uartBuffer.dataSize) {
         events |= EVENT_UART_DATA_READY;
-                    while(1);
     }
 
     if (canBuffer.dataSize) {
@@ -272,34 +282,34 @@ void manageEncoders() {
             robot_encoders.SA_ENCDR[i][j + 1] = robot_encoders.SA_ENCDR[i][j];
         }
     }
-
+    
     selectCS(RL_ODD_1, RL_ODD_2);
     readEncLong(&EncCtsLong);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    robot_encoders.RL_ENCDR[0][0] = -EncCtsLong.cts1;
-    robot_encoders.RL_ENCDR[2][0] = -EncCtsLong.cts2;
-    robot_encoders.RL_ENCDR[4][0] = -EncCtsLong.cts3;
+    robot_encoders.RL_ENCDR[0][0] = -EncCtsLong.cts1 + (STRING_OFFSET_0 - STRING_ZERO_LENGTH);
+    robot_encoders.RL_ENCDR[2][0] = -EncCtsLong.cts2 + (STRING_OFFSET_2 - STRING_ZERO_LENGTH);
+    robot_encoders.RL_ENCDR[4][0] = -EncCtsLong.cts3 + (STRING_OFFSET_4 - STRING_ZERO_LENGTH);
 
     selectCS(RL_EVEN_1, RL_EVEN_2);
     readEncLong(&EncCtsLong);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    robot_encoders.RL_ENCDR[1][0] = EncCtsLong.cts3;
-    robot_encoders.RL_ENCDR[3][0] = EncCtsLong.cts1;
-    robot_encoders.RL_ENCDR[5][0] = EncCtsLong.cts2;
+    robot_encoders.RL_ENCDR[1][0] = EncCtsLong.cts3 + (STRING_OFFSET_1 - STRING_ZERO_LENGTH);
+    robot_encoders.RL_ENCDR[3][0] = EncCtsLong.cts1 + (STRING_OFFSET_3 - STRING_ZERO_LENGTH);
+    robot_encoders.RL_ENCDR[5][0] = EncCtsLong.cts2 + (STRING_OFFSET_5 - STRING_ZERO_LENGTH);
 
     selectCS(SF_ODD_1, SF_ODD_2);
     readEnc(&EncCts);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    robot_encoders.SF_ENCDR[0][0] = -EncCts.cts3;
-    robot_encoders.SF_ENCDR[2][0] = -EncCts.cts1;
-    robot_encoders.SF_ENCDR[4][0] = -EncCts.cts2;
+    robot_encoders.SF_ENCDR[0][0] = robot_encoders.SF_ENCDR[0][0] / 2 - EncCts.cts3;
+    robot_encoders.SF_ENCDR[2][0] = robot_encoders.SF_ENCDR[2][0] / 2 - EncCts.cts1;
+    robot_encoders.SF_ENCDR[4][0] = robot_encoders.SF_ENCDR[4][0] / 2 - EncCts.cts2;
 
     selectCS(SF_EVEN_1, SF_EVEN_2);
     readEnc(&EncCts);
     selectCS(ALL_CS_HIGH, ALL_CS_HIGH);
-    robot_encoders.SF_ENCDR[1][0] = EncCts.cts1;
-    robot_encoders.SF_ENCDR[3][0] = EncCts.cts2;
-    robot_encoders.SF_ENCDR[5][0] = EncCts.cts3;
+    robot_encoders.SF_ENCDR[1][0] = robot_encoders.SF_ENCDR[1][0] / 2 + EncCts.cts1;
+    robot_encoders.SF_ENCDR[3][0] = robot_encoders.SF_ENCDR[3][0] / 2 + EncCts.cts2;
+    robot_encoders.SF_ENCDR[5][0] = robot_encoders.SF_ENCDR[5][0] / 2 + EncCts.cts3;
 
     selectCS(SA_ODD_1, SA_ODD_2);
     readEnc(&EncCts);
@@ -319,11 +329,11 @@ void manageEncoders() {
     //        robot_encoders.SA_ENCDR[i][0] = robot_encoders.SA_ENCDR[i][0]*(1 - robot_switches.SA[i]);
     //        robot_encoders.SF_ENCDR[i][0] = robot_encoders.SF_ENCDR[i][0]*(1 - robot_switches.SF[i]);
     //    }
-    int h = 50; // data freq/(2*10)
+    int h = 250; // data freq/(2*10)
     for (i = 0; i < 6; i++) {
-        robot_encoders.RL_VEL[i] = (9 * robot_encoders.RL_VEL[i]) / 10 + (3 * robot_encoders.RL_ENCDR[i][0] - 4 * robot_encoders.RL_ENCDR[i][1] + robot_encoders.RL_ENCDR[i][2]) * h;
-        robot_encoders.SF_VEL[i] = (9 * robot_encoders.SF_VEL[i]) / 10 + (3 * robot_encoders.SF_ENCDR[i][0] - 4 * robot_encoders.SF_ENCDR[i][1] + robot_encoders.SF_ENCDR[i][2]) * h;
-        robot_encoders.SA_VEL[i] = (9 * robot_encoders.SA_VEL[i]) / 10 + (3 * robot_encoders.SA_ENCDR[i][0] - 4 * robot_encoders.SA_ENCDR[i][1] + robot_encoders.SA_ENCDR[i][2]) * h;
+        robot_encoders.RL_VEL[i] = (1 * robot_encoders.RL_VEL[i]) / 2 + (3 * robot_encoders.RL_ENCDR[i][0] - 4 * robot_encoders.RL_ENCDR[i][1] + robot_encoders.RL_ENCDR[i][2]) * h;
+        robot_encoders.SF_VEL[i] = (1 * robot_encoders.SF_VEL[i]) / 2 + (3 * robot_encoders.SF_ENCDR[i][0] - 4 * robot_encoders.SF_ENCDR[i][1] + robot_encoders.SF_ENCDR[i][2]) * h;
+        robot_encoders.SA_VEL[i] = (1 * robot_encoders.SA_VEL[i]) / 2 + (3 * robot_encoders.SA_ENCDR[i][0] - 4 * robot_encoders.SA_ENCDR[i][1] + robot_encoders.SA_ENCDR[i][2]) * h;
     }
 }
 
@@ -338,16 +348,17 @@ void manageMotors(int *targetForce) {
 }
 
 void PositionPD(int *targetForce) {
-    long int targetPosition[6];
-    targetPosition[0] = -200000;
-    targetPosition[1] = -200000;
-    targetPosition[2] = -200000;
-    targetPosition[3] = -200000;
-    targetPosition[4] = -200000;
-    targetPosition[5] = -200000;
+
+    targetPosition[0] = commandSet.cmd1;
+    targetPosition[1] = commandSet.cmd2;
+    targetPosition[2] = commandSet.cmd3;
+    targetPosition[3] = commandSet.cmd4;
+    targetPosition[4] = commandSet.cmd5;
+    targetPosition[5] = commandSet.cmd6;
+    
     int jj = 0;
     for (jj = 0; jj < 6; jj++) {
-        targetForce[jj] = -(targetPosition[jj] - robot_encoders.RL_ENCDR[jj][0]) / POS_Kp;
+        targetForce[jj] = (robot_encoders.RL_ENCDR[jj][0] - targetPosition[jj]) / POS_Kp; // + robot_encoders.RL_VEL[jj] / POS_Kd;
         targetForce[jj] = ((targetForce[jj] < MIN_FORCE) ? MIN_FORCE : (targetForce[jj] > MAX_FORCE) ? MAX_FORCE : targetForce[jj]);
     }
 }

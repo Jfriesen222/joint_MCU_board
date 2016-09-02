@@ -167,7 +167,8 @@ uint8_t DecodeStream(uint8_t newChar)
 				nmea.out->cmd2 = atoi(strtok(NULL, (const char *) ","));
 				nmea.out->cmd3 = atoi(strtok(NULL, (const char *) ","));
 				nmea.out->cmd4 = atoi(strtok(NULL, (const char *) ","));
-                                nmea.out->cmd5 = atoi(strtok(NULL, (const char *) ","));
+                nmea.out->cmd5 = atoi(strtok(NULL, (const char *) ","));
+                nmea.out->cmd6 = atoi(strtok(NULL, (const char *) ","));
 				return(1);
 			} else {
 				nmea.index = 0;
