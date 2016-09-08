@@ -22,13 +22,13 @@
 
 /* Control Gains */
 #define MAX_RL -1000
-#define FORCE_Kp 125
-#define POS_Kp 750
+#define FORCE_Kp 100
+int POS_Kp=350;
 #define POS_Kd 2000
 
 #define RECALIBRATION
 /* Force constraints  */
-#define MAX_FORCE 200
+#define MAX_FORCE 250
 #define MIN_FORCE 20
 long int SA_MAX_VEL = 2000;
 long int SF_MAX_VEL = 1000;
@@ -55,8 +55,6 @@ ADCBuffer ADCBuff;
 long int iii = 0;
 int jj = 1;
 int jjj = 0;
-float flex1 = 0;
-float flex2 = 0;
 actuatorCommands commandSet;
 
 enum {
@@ -76,12 +74,13 @@ void PositionPD(int *targetForce);
 long int targetPosition[6];
 
 int main(void) {
-    commandSet.cmd1 = -225000;
-    commandSet.cmd2 = -225000;
-    commandSet.cmd3 = -225000;
-    commandSet.cmd4 = -225000;
-    commandSet.cmd5 = -225000;
-    commandSet.cmd6 = -225000;
+    commandSet.cmd1 = 0;
+    commandSet.cmd2 = 0;
+    commandSet.cmd3 = 0;
+    commandSet.cmd4 = 0;
+    commandSet.cmd5 = 0;
+    commandSet.cmd6 = 0;
+    commandSet.cmd7 = 350;
     static uint8_t out[500];
     static uint8_t size;
     int targetForce[6];
@@ -169,10 +168,10 @@ int main(void) {
                 } else {
                     spi_error_count = 0;
 
-                    size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %7ld %7ld %7ld %7ld %7ld %7ld\r\n",
+                    size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %7ld %7ld %7ld %7ld %7ld %7ld Kp: %7ld\r\n",
                             robot_encoders.RL_ENCDR[0][pos], robot_encoders.RL_ENCDR[1][pos], robot_encoders.RL_ENCDR[2][pos], robot_encoders.RL_ENCDR[3][pos], robot_encoders.RL_ENCDR[4][pos], robot_encoders.RL_ENCDR[5][pos],
                             robot_encoders.SF_ENCDR[0][pos], robot_encoders.SF_ENCDR[1][pos], robot_encoders.SF_ENCDR[2][pos], robot_encoders.SF_ENCDR[3][pos], robot_encoders.SF_ENCDR[4][pos], robot_encoders.SF_ENCDR[5][pos],
-                            commandSet.cmd1, commandSet.cmd2, commandSet.cmd3, commandSet.cmd4, commandSet.cmd5, commandSet.cmd6);
+                            commandSet.cmd1, commandSet.cmd2, commandSet.cmd3, commandSet.cmd4, commandSet.cmd5, commandSet.cmd6, commandSet.cmd7);
 
                     //                 size = sprintf((char *) out, "RL: %10ld %10ld %10ld %10ld %10ld %10ld  SF: %6d %6d %6d %6d %6d %6d  SA: %6d %6d %6d %6d %6d %6d\r\n",
                     //                        robot_encoders.RL_VEL[0], robot_encoders.RL_VEL[1], robot_encoders.RL_VEL[2], robot_encoders.RL_VEL[3], robot_encoders.RL_VEL[4], robot_encoders.RL_VEL[5],
@@ -357,6 +356,7 @@ void PositionPD(int *targetForce) {
     targetPosition[3] = commandSet.cmd4;
     targetPosition[4] = commandSet.cmd5;
     targetPosition[5] = commandSet.cmd6;
+    POS_Kp = commandSet.cmd7;
 
     int jj = 0;
     for (jj = 0; jj < 6; jj++) {

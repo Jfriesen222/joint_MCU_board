@@ -48,6 +48,7 @@ typedef struct {
     long int cmd4;
     long int cmd5;
     long int cmd6;
+    long int cmd7;
 } Commands;
 
 typedef Commands actuatorCommands;

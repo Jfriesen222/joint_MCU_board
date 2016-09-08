@@ -211,13 +211,13 @@
 #define TRIS_RESET_3            TRISDbits.TRISD7
 #define RESET_3                 LATDbits.LATD7
 
-#define STRING_OFFSET_0     356700
-#define STRING_OFFSET_1     347800
-#define STRING_OFFSET_2     362800
-#define STRING_OFFSET_3     352100
-#define STRING_OFFSET_4     352800
-#define STRING_OFFSET_5     356000
-#define STRING_ZERO_LENGTH  330000
+#define STRING_OFFSET_0     0//356700
+#define STRING_OFFSET_1     0//347800
+#define STRING_OFFSET_2     0//362800
+#define STRING_OFFSET_3     0//352100
+#define STRING_OFFSET_4     0//352800
+#define STRING_OFFSET_5     0//356000
+#define STRING_ZERO_LENGTH  0//330000
 
 
 

@@ -93,7 +93,7 @@ uint8_t DecodeStream(uint8_t newChar)
 		break;
 
 	case STATE_RECORDING:
-		if ((newChar == '$') || ((newChar == '*' && (nmea.index < 23))) ||
+		if ((newChar == '$') || ((newChar == '*' && (nmea.index < 20))) ||
 			 newChar == '\r' || newChar == '\n') {
 			nmea.index = 0;
 			nmea.currentState = STATE_WAITING;
@@ -159,19 +159,25 @@ uint8_t DecodeStream(uint8_t newChar)
 				i++;
 			}
             long int datas[6];
-			if ( nmea.index == 24 && checkSum == nmea.data.checksum) {
+			if ( nmea.index == 21 && checkSum == nmea.data.checksum) {
 				for(i =0; i<6; i++){
-                  datas[i] =  (nmea.data.sentence[4*i + 3]|datas[i])<<8;
-                  datas[i] =  (nmea.data.sentence[4*i + 2]|datas[i])<<8;
-                  datas[i] =  (nmea.data.sentence[4*i + 1]|datas[i])<<8;
-                  datas[i] =  (nmea.data.sentence[4*i]|datas[i]);
+                  datas[i] = 0;
+                  datas[i] =  (255|datas[i])<<8;
+                  datas[i] =  (nmea.data.sentence[3*i + 2]|datas[i])<<8;
+                  datas[i] =  (nmea.data.sentence[3*i + 1]|datas[i])<<8;
+                  datas[i] =  (nmea.data.sentence[3*i]|datas[i]);
                 }
+                datas[6] = 0;
+                datas[6] =  (nmea.data.sentence[20]|datas[6])<<8;
+                datas[6] =  (nmea.data.sentence[19]|datas[6])<<8;
+                datas[6] =  (nmea.data.sentence[18]|datas[6]);
 				nmea.out->cmd1 = datas[0];
 				nmea.out->cmd2 = datas[1];
 				nmea.out->cmd3 = datas[2];
 				nmea.out->cmd4 = datas[3];
                 nmea.out->cmd5 = datas[4];
-                nmea.out->cmd6 = datas[5];         
+                nmea.out->cmd6 = datas[5];
+                nmea.out->cmd7 = datas[6];
                 nmea.index = 0;
 				return(1);
 			} else {
