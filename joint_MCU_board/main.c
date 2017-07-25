@@ -187,9 +187,9 @@ int main(void) {
 
                 }
                 //LED1 = (jj & 0b1);
-                //LED2 = (jj & 0b10) >> 1;
-                //LED3 = (jj & 0b100) >> 2;
-                //LED4 = (jj & 0b1000) >> 3;
+                LED2 = (jj & 0b10) >> 1;
+                LED3 = (jj & 0b100) >> 2;
+                LED4 = (jj & 0b1000) >> 3;
                 jj = ((jj << 1));
                 jj = jj == 0b10000 ? 1 : jj;
             }
@@ -234,7 +234,7 @@ int main(void) {
             //RESET_1 = RESET_2 = RESET_3 = !RESET_1;
 
             //LED7 = !LED7;
-            //                                                LED8 = 1;
+            //                                                LED8 = 1
             if (DecodeStream(data)) {
                 events |= EVENT_UPDATE_LENGTHS;
             }

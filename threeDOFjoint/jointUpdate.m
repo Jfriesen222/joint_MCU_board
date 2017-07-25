@@ -3,7 +3,7 @@ function jointUpdate(vec,joint1,jointCommandPlot1,jointDynamicsPlot1,pStruct1)
 %   Detailed explanation goes here
 
 %create some persistent variables for objects and structs
-persistent joint jointCommandPlot jointDynamicsPlot pStruct i s
+persistent joint jointCommandPlot pStruct i s
 if nargin>1
     joint = joint1;
     jointCommandPlot = jointCommandPlot1;
